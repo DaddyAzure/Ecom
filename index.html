@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WandyT Company | Minecraft Armory & Arcana</title>
+  <style>
+    :root {
+      --bg-dark: #0f1015;
+      --panel-bg: #181a20;
+      --card-bg: #21242d;
+      --accent-emerald: #00d166;
+      --accent-emerald-hover: #00b355;
+      --accent-diamond: #4deeea;
+      --accent-netherite: #df80ff;
+      --text-main: #f0f2f5;
+      --text-muted: #9aa0a6;
+      --border-color: #2c303c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    /* Top Navigation */
+    header {
+      background-color: var(--panel-bg);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--accent-emerald);
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .llama-icon {
+      width: 28px;
+      height: 28px;
+      display: inline-block;
+      image-rendering: pixelated;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-diamond);
+    }
+
+    .cart-btn {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      color: var(--accent-emerald);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Hero Section */
+    .hero {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 3rem 2rem;
+      background: linear-gradient(135deg, #1b1e27 0%, #111318 100%);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .hero-content h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .hero-content span {
+      color: var(--accent-emerald);
+    }
+
+    .hero-content p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+    }
+
+    .cta-btn {
+      background-color: var(--accent-emerald);
+      color: #05140b;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-block;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .cta-btn:hover {
+      background-color: var(--accent-emerald-hover);
+    }
+
+    /* Trust Banner */
+    .trust-banner {
+      background-color: var(--panel-bg);
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1.2rem 2rem;
+    }
+
+    .trust-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-around;
+      text-align: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .trust-item {
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .trust-item span {
+      color: var(--accent-diamond);
+      margin-right: 0.4rem;
+    }
+
+    /* General Container & Category Grid */
+    .container {
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid var(--accent-emerald);
+      padding-left: 0.75rem;
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .category-card {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .category-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-diamond);
+    }
+
+    /* Tab Controls */
+    .tabs-nav {
+      display: flex;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 0.8rem 1.5rem;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+    }
+
+    .tab-btn.active {
+      color: var(--accent-emerald);
+    }
+
+    .tab-btn.active::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background-color: var(--accent-emerald);
+      border-radius: 3px 3px 0 0;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* Product Cards */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .product-card {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .image-placeholder {
+      width: 100%;
+      height: 180px;
+      background-color: var(--card-bg);
+      border: 2px dashed var(--border-color);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      text-align: center;
+      padding: 0.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .badge-diamond {
+      background-color: rgba(77, 238, 234, 0.15);
+      color: var(--accent-diamond);
+    }
+
+    .badge-book {
+      background-color: rgba(220, 100, 255, 0.15);
+      color: #df80ff;
+    }
+
+    .price-tag {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent-emerald);
+      margin: 0.8rem 0;
+    }
+
+    .upgrade-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0.5rem 0;
+      font-size: 0.85rem;
+      color: var(--accent-netherite);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .add-to-cart-btn {
+      width: 100%;
+      background-color: var(--card-bg);
+      border: 1px solid var(--accent-emerald);
+      color: var(--accent-emerald);
+      padding: 0.6rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .add-to-cart-btn:hover {
+      background-color: var(--accent-emerald);
+      color: #05140b;
+    }
+
+    /* Footer */
+    footer {
+      background-color: var(--panel-bg);
+      border-top: 1px solid var(--border-color);
+      padding: 3rem 2rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .footer-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+    }
+
+    .footer-col h4 {
+      color: var(--text-main);
+      margin-bottom: 1rem;
+    }
+
+    .footer-col ul {
+      list-style: none;
+    }
+
+    .footer-col ul li {
+      margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header>
+    <div class="nav-container">
+      <div class="logo">
+        <!-- Pixel-Art Minecraft Llama Face SVG -->
+        <svg class="llama-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Ears -->
+          <rect x="2" y="0" width="3" height="4" fill="#a89279"/>
+          <rect x="11" y="0" width="3" height="4" fill="#a89279"/>
+          <rect x="3" y="1" width="1" height="2" fill="#5c4e3e"/>
+          <rect x="12" y="1" width="1" height="2" fill="#5c4e3e"/>
+          <!-- Head Base -->
+          <rect x="2" y="3" width="12" height="12" fill="#c4b29a"/>
+          <rect x="3" y="4" width="10" height="10" fill="#dfd3be"/>
+          <!-- Forehead / Wool Shading -->
+          <rect x="4" y="4" width="8" height="3" fill="#eae3d2"/>
+          <!-- Eyes -->
+          <rect x="2" y="7" width="3" height="2" fill="#2d231b"/>
+          <rect x="2" y="7" width="1" height="1" fill="#ffffff"/>
+          <rect x="11" y="7" width="3" height="2" fill="#2d231b"/>
+          <rect x="13" y="7" width="1" height="1" fill="#ffffff"/>
+          <!-- Snout / Muzzle -->
+          <rect x="5" y="8" width="6" height="6" fill="#8f7c66"/>
+          <rect x="6" y="9" width="4" height="4" fill="#6f5e4c"/>
+          <!-- Nostrils -->
+          <rect x="6" y="10" width="1" height="1" fill="#2b231d"/>
+          <rect x="9" y="10" width="1" height="1" fill="#2b231d"/>
+          <!-- Mouth -->
+          <rect x="7" y="12" width="2" height="1" fill="#3a2e26"/>
+          <!-- Cheek Tufts -->
+          <rect x="1" y="8" width="1" height="3" fill="#b09f87"/>
+          <rect x="14" y="8" width="1" height="3" fill="#b09f87"/>
+        </svg>
+        <span>WandyT Company</span>
+      </div>
+      <ul class="nav-links">
+        <li><a onclick="switchTab('tools-tab')">Tools</a></li>
+        <li><a onclick="switchTab('armor-tab')">Armour</a></li>
+        <li><a onclick="switchTab('librarian-tab')">Librarian Vault</a></li>
+      </ul>
+      <button class="cart-btn" id="cart-counter">🛒 Cart (0 EME)</button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Forged for the Deep Dark, <span>Enchanted for Eternity</span></h1>
+      <p>Equip yourself with Diamond and Netherite-grade equipment from WandyT Company. Certified curse-free by the Village Cleric Guild.</p>
+      <button class="cta-btn" onclick="switchTab('tools-tab'); document.getElementById('catalog').scrollIntoView({behavior: 'smooth'});">
+        Browse the Anvil Armory
+      </button>
+    </div>
+    <div class="image-placeholder">
+      <strong>[ PASTE HERO BANNER / FORGE ARTWORK HERE ]</strong>
+      <span>Recommended: 600x350px PNG</span>
+    </div>
+  </section>
+
+  <!-- Trust Banner -->
+  <div class="trust-banner">
+    <div class="trust-grid">
+      <div class="trust-item"><span>🛡️</span> 100% Curse-Free Guarantee</div>
+      <div class="trust-item"><span>📦</span> Ender Chest Sync (Instant Delivery)</div>
+      <div class="trust-item"><span>📜</span> Cleric Guild Certified Arcana</div>
+      <div class="trust-item"><span>⛏️</span> Repairable at any Standard Anvil</div>
+    </div>
+  </div>
+
+  <main class="container" id="catalog">
+    <!-- Category Grid / Interactive Switchers -->
+    <h2 class="section-title">Armory Department</h2>
+    <div class="category-grid">
+      <div class="category-card" onclick="switchTab('tools-tab')">
+        <h3>Mining & Excavation</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Pickaxes, axes, and trench shovels built for heavy yield.</p>
+      </div>
+      <div class="category-card" onclick="switchTab('armor-tab')">
+        <h3>Combat & Defense</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Full plate sets forged for Nether and Warden raids.</p>
+      </div>
+      <div class="category-card" onclick="switchTab('librarian-tab')">
+        <h3>Librarian's Vault</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">High-potency tomes, mending scrolls, and swift sneak arcana.</p>
+      </div>
+    </div>
+
+    <!-- Tab Selector -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" id="btn-tools-tab" onclick="switchTab('tools-tab')">Tools</button>
+      <button class="tab-btn" id="btn-armor-tab" onclick="switchTab('armor-tab')">Armour</button>
+      <button class="tab-btn" id="btn-librarian-tab" onclick="switchTab('librarian-tab')">Librarian Vault</button>
+    </div>
+
+    <!-- TAB 1: TOOLS -->
+    <div class="tab-pane active" id="tools-tab">
+      <div class="product-grid">
+        <!-- Pickaxe -->
+        <div class="product-card" data-base-price="32" data-upgrade-cost="24">
+          <div class="image-placeholder">
+            <strong>[ PASTE PICKAXE IMAGE HERE ]</strong>
+          </div>
+          <span class="badge badge-diamond item-badge">Diamond Tier</span>
+          <h3 class="item-title">Excavator Pickaxe</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Efficiency V, Unbreaking III</p>
+          <label class="upgrade-toggle">
+            <input type="checkbox" onchange="toggleNetherite(this)" />
+            Upgrade to Netherite (+24 EME)
+          </label>
+          <div class="price-tag">Price: <span class="current-price">32</span> Emeralds</div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+
+        <!-- Axe -->
+        <div class="product-card" data-base-price="28" data-upgrade-cost="24">
+          <div class="image-placeholder">
+            <strong>[ PASTE AXE IMAGE HERE ]</strong>
+          </div>
+          <span class="badge badge-diamond item-badge">Diamond Tier</span>
+          <h3 class="item-title">Timber & Cleave Axe</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Sharpness V, Efficiency IV</p>
+          <label class="upgrade-toggle">
+            <input type="checkbox" onchange="toggleNetherite(this)" />
+            Upgrade to Netherite (+24 EME)
+          </label>
+          <div class="price-tag">Price: <span class="current-price">28</span> Emeralds</div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+
+        <!-- Shovel -->
+        <div class="product-card" data-base-price="16" data-upgrade-cost="20">
+          <div class="image-placeholder">
+            <strong>[ PASTE SHOVEL IMAGE HERE ]</strong>
+          </div>
+          <span class="badge badge-diamond item-badge">Diamond Tier</span>
+          <h3 class="item-title">Dune Trench Shovel</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Silk Touch I, Unbreaking III</p>
+          <label class="upgrade-toggle">
+            <input type="checkbox" onchange="toggleNetherite(this)" />
+            Upgrade to Netherite (+20 EME)
+          </label>
+          <div class="price-tag">Price: <span class="current-price">16</span> Emeralds</div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: ARMOUR -->
+    <div class="tab-pane" id="armor-tab">
+      <div class="product-grid">
+        <!-- Helmet -->
+        <div class="product-card" data-base-price="24" data-upgrade-cost="28">
+          <div class="image-placeholder">
+            <strong>[ PASTE HELMET IMAGE HERE ]</strong>
+          </div>
+          <span class="badge badge-diamond item-badge">Diamond Tier</span>
+          <h3 class="item-title">Crown of the Abyss</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Respiration III, Aqua Affinity</p>
+          <label class="upgrade-toggle">
+            <input type="checkbox" onchange="toggleNetherite(this)" />
+            Upgrade to Netherite (+28 EME)
+          </label>
+          <div class="price-tag">Price: <span class="current-price">24</span> Emeralds</div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+
+        <!-- Chestplate -->
+        <div class="product-card" data-base-price="40" data-upgrade-cost="32">
+          <div class="image-placeholder">
+            <strong>[ PASTE CHESTPLATE IMAGE HERE ]</strong>
+          </div>
+          <span class="badge badge-diamond item-badge">Diamond Tier</span>
+          <h3 class="item-title">Bastion Bulwark</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Protection IV, Unbreaking III</p>
+          <label class="upgrade-toggle">
+            <input type="checkbox" onchange="toggleNetherite(this)" />
+            Upgrade to Netherite (+32 EME)
+          </label>
+          <div class="price-tag">Price: <span class="current-price">40</span> Emeralds</div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+
+        <!-- Leggings -->
+        <div class="product-card" data-base-price="34" data-upgrade-cost="30">
+          <div class="image-placeholder">
+            <strong>[ PASTE LEGGINGS IMAGE HERE ]</strong>
+          </div>
+          <span class="badge badge-diamond item-badge">Diamond Tier</span>
+          <h3 class="item-title">Stride Greaves</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Swift Sneak III, Protection IV</p>
+          <label class="upgrade-toggle">
+            <input type="checkbox" onchange="toggleNetherite(this)" />
+            Upgrade to Netherite (+30 EME)
+          </label>
+          <div class="price-tag">Price: <span class="current-price">34</span> Emeralds</div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+
+        <!-- Boots -->
+        <div class="product-card" data-base-price="20" data-upgrade-cost="28">
+          <div class="image-placeholder">
+            <strong>[ PASTE BOOTS IMAGE HERE ]</strong>
+          </div>
+          <span class="badge badge-diamond item-badge">Diamond Tier</span>
+          <h3 class="item-title">Cloudwalkers</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Feather Falling IV, Soul Speed III</p>
+          <label class="upgrade-toggle">
+            <input type="checkbox" onchange="toggleNetherite(this)" />
+            Upgrade to Netherite (+28 EME)
+          </label>
+          <div class="price-tag">Price: <span class="current-price">20</span> Emeralds</div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: LIBRARIAN VAULT -->
+    <div class="tab-pane" id="librarian-tab">
+      <div class="product-grid">
+        <!-- Mending -->
+        <div class="product-card" data-base-price="48">
+          <div class="image-placeholder">
+            <strong>[ PASTE ENCHANTED BOOK IMAGE HERE ]</strong>
+          </div>
+          <span class="badge badge-book">Forbidden Arcana</span>
+          <h3 class="item-title">Tome of Mending</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Restores item durability using gathered experience orbs.</p>
+          <div class="price-tag">Price: <span class="current-price">48</span> Emeralds</div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+
+        <!-- Fortune III -->
+        <div class="product-card" data-base-price="36">
+          <div class="image-placeholder">
+            <strong>[ PASTE ENCHANTED BOOK IMAGE HERE ]</strong>
+          </div>
+          <span class="badge badge-book">Resource Arcana</span>
+          <h3 class="item-title">Tome of Fortune III</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Multiplies raw drop yields from diamond, gold, and coal ores.</p>
+          <div class="price-tag">Price: <span class="current-price">36</span> Emeralds</div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+
+        <!-- Silk Touch -->
+        <div class="product-card" data-base-price="32">
+          <div class="image-placeholder">
+            <strong>[ PASTE ENCHANTED BOOK IMAGE HERE ]</strong>
+          </div>
+          <span class="badge badge-book">Excavation Arcana</span>
+          <h3 class="item-title">Tome of Silk Touch</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Mines fragile blocks intact (ice, glass, campfires, and ores).</p>
+          <div class="price-tag">Price: <span class="current-price">32</span> Emeralds</div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+
+        <!-- Looting III -->
+        <div class="product-card" data-base-price="42">
+          <div class="image-placeholder">
+            <strong>[ PASTE ENCHANTED BOOK IMAGE HERE ]</strong>
+          </div>
+          <span class="badge badge-book">Combat Arcana</span>
+          <h3 class="item-title">Tome of Looting III</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Increases mob loot quantity and rare drop probabilities.</p>
+          <div class="price-tag">Price: <span class="current-price">42</span> Emeralds</div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+
+        <!-- Feather Falling IV -->
+        <div class="product-card" data-base-price="28">
+          <div class="image-placeholder">
+            <strong>[ PASTE ENCHANTED BOOK IMAGE HERE ]</strong>
+          </div>
+          <span class="badge badge-book">Survival Arcana</span>
+          <h3 class="item-title">Tome of Feather Falling IV</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Reduces vertical fall damage and pearl teleportation impacts.</p>
+          <div class="price-tag">Price: <span class="current-price">28</span> Emeralds</div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+
+        <!-- Infinity -->
+        <div class="product-card" data-base-price="30">
+          <div class="image-placeholder">
+            <strong>[ PASTE ENCHANTED BOOK IMAGE HERE ]</strong>
+          </div>
+          <span class="badge badge-book">Archery Arcana</span>
+          <h3 class="item-title">Tome of Infinity</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Fires unlimited arrows without depleting quiver inventory.</p>
+          <div class="price-tag">Price: <span class="current-price">30</span> Emeralds</div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+
+        <!-- Sharpness V -->
+        <div class="product-card" data-base-price="38">
+          <div class="image-placeholder">
+            <strong>[ PASTE ENCHANTED BOOK IMAGE HERE ]</strong>
+          </div>
+          <span class="badge badge-book">Combat Arcana</span>
+          <h3 class="item-title">Tome of Sharpness V</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Imbues melee weapons with maximum physical cutting damage.</p>
+          <div class="price-tag">Price: <span class="current-price">38</span> Emeralds</div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+
+        <!-- Swift Sneak III -->
+        <div class="product-card" data-base-price="45">
+          <div class="image-placeholder">
+            <strong>[ PASTE ENCHANTED BOOK IMAGE HERE ]</strong>
+          </div>
+          <span class="badge badge-book">Ancient City Relic</span>
+          <h3 class="item-title">Tome of Swift Sneak III</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Walk at full operational speed while remaining completely crouched.</p>
+          <div class="price-tag">Price: <span class="current-price">45</span> Emeralds</div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>WandyT Company Warranty</h4>
+        <ul>
+          <li>Free Grindstone Disenchantments</li>
+          <li>30-Day Netherite Structural Guarantee</li>
+          <li>Anvil Overheat & Shatter Protection</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Logistics & Delivery</h4>
+        <ul>
+          <li>Ender Chest Protocol</li>
+          <li>Allay Express (Chunk Delivery)</li>
+          <li>Wandering Trader Tracking</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Cleric Guild Compliance</h4>
+        <ul>
+          <li>Curse of Vanishing Verification</li>
+          <li>Fair Emerald Trading Standards</li>
+          <li>Village Raiding Insurance</li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Interactive Logic -->
+  <script>
+    let totalEmeralds = 0;
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+      const targetPane = document.getElementById(tabId);
+      const targetBtn = document.getElementById('btn-' + tabId);
+
+      if (targetPane) targetPane.classList.add('active');
+      if (targetBtn) targetBtn.classList.add('active');
+    }
+
+    function toggleNetherite(checkbox) {
+      const card = checkbox.closest('.product-card');
+      const basePrice = parseInt(card.getAttribute('data-base-price'));
+      const upgradeCost = parseInt(card.getAttribute('data-upgrade-cost'));
+      const priceDisplay = card.querySelector('.current-price');
+      const badge = card.querySelector('.item-badge');
+
+      if (checkbox.checked) {
+        priceDisplay.textContent = basePrice + upgradeCost;
+        badge.textContent = 'Netherite Tier';
+        badge.style.color = '#df80ff';
+        badge.style.backgroundColor = 'rgba(223, 128, 255, 0.15)';
+      } else {
+        priceDisplay.textContent = basePrice;
+        badge.textContent = 'Diamond Tier';
+        badge.style.color = 'var(--accent-diamond)';
+        badge.style.backgroundColor = 'rgba(77, 238, 234, 0.15)';
+      }
+    }
+
+    function addToCart(button) {
+      const card = button.closest('.product-card');
+      const price = parseInt(card.querySelector('.current-price').textContent);
+      totalEmeralds += price;
+      
+      const cartBtn = document.getElementById('cart-counter');
+      cartBtn.textContent = `🛒 Cart (${totalEmeralds} EME)`;
+
+      const originalText = button.textContent;
+      button.textContent = "Added to Ender Chest!";
+      button.style.backgroundColor = "var(--accent-emerald)";
+      button.style.color = "#05140b";
+      
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.style.backgroundColor = "var(--card-bg)";
+        button.style.color = "var(--accent-emerald)";
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
