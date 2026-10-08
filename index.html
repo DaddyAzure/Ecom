@@ -3,785 +3,1297 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WandyT Company | Minecraft Armory & Arcana</title>
+  <title>WandyT Company | Premium Armory & Arcana</title>
   <style>
     :root {
-      --bg-dark: #0f1015;
-      --panel-bg: #181a20;
-      --card-bg: #21242d;
-      --accent-emerald: #00d166;
-      --accent-emerald-hover: #00b355;
-      --accent-diamond: #4deeea;
-      --accent-netherite: #df80ff;
-      --text-main: #f0f2f5;
-      --text-muted: #9aa0a6;
-      --border-color: #2c303c;
+      /* Colors */
+      --bg-base: #050507;
+      --bg-panel: rgba(18, 19, 25, 0.55);
+      --bg-panel-solid: #121319;
+      --border-glass: rgba(255, 255, 255, 0.06);
+      --border-highlight: rgba(255, 255, 255, 0.12);
+      
+      --accent-emerald: #00e676;
+      --accent-emerald-glow: rgba(0, 230, 118, 0.25);
+      --accent-diamond: #00e5ff;
+      --accent-netherite: #d500f9;
+      
+      --text-main: #ffffff;
+      --text-muted: #8b949e;
+      
+      /* Typography */
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      
+      /* Layout & Shadows */
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+      --shadow-neon: 0 4px 15px var(--accent-emerald-glow);
+      
+      /* Z-Index */
+      --z-behind: -1;
+      --z-base: 1;
+      --z-header: 100;
+      --z-cart: 200;
+      --z-modal: 300;
+      --z-toast: 400;
+      --z-cursor: 9999;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: var(--font-sans);
+    }
+
+    /* Only hide the default cursor if the custom image loads successfully */
+    body.custom-cursor-active,
+    body.custom-cursor-active * {
+      cursor: none !important;
+    }
+
+    /* Custom HTML Cursor */
+    #custom-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 35px;
+      height: 35px;
+      pointer-events: none;
+      z-index: var(--z-cursor);
+      transform-origin: top left;
+      will-change: transform;
+      /* Only transition dimensions for the hover effect, not position to prevent lag */
+      transition: width 0.2s ease, height 0.2s ease, filter 0.2s ease;
+      color: transparent; /* Hide broken alt text if path fails */
+      display: none; /* Hidden until loaded */
+    }
+    
+    #custom-cursor.active {
+      width: 45px;
+      height: 45px;
+      filter: drop-shadow(0 0 10px var(--accent-diamond));
     }
 
     body {
-      background-color: var(--bg-dark);
+      background-color: var(--bg-base);
       color: var(--text-main);
       line-height: 1.6;
+      overflow-x: hidden;
+      background-image: radial-gradient(circle at 50% 0%, #151a25 0%, var(--bg-base) 60%);
     }
 
-    /* Top Navigation */
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-base); }
+    ::-webkit-scrollbar-thumb { background: #2c303c; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent-emerald); }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes fadeUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(15px);
+      transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .glass {
+      background: var(--bg-panel);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glass);
+      box-shadow: var(--shadow-glass);
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #fff 0%, var(--accent-emerald) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
     header {
-      background-color: var(--panel-bg);
-      border-bottom: 1px solid var(--border-color);
       position: sticky;
       top: 0;
-      z-index: 100;
+      width: 100%;
+      z-index: var(--z-header);
+      padding: 1rem 0;
+      transition: all 0.3s ease;
     }
 
     .nav-container {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 1rem 2rem;
+      padding: 0 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
     .logo {
-      font-size: 1.3rem;
+      font-size: 1.5rem;
       font-weight: 800;
-      color: var(--accent-emerald);
-      letter-spacing: 0.5px;
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.75rem;
+      letter-spacing: -0.5px;
     }
 
-    .llama-icon {
-      width: 28px;
-      height: 28px;
-      display: inline-block;
-      image-rendering: pixelated;
+    .llama-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
+      /* Removed pixelated rendering for jpgs to prevent visual distortion */
+      border: 2px solid var(--border-highlight);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
-    .nav-links {
-      display: flex;
-      gap: 1.5rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-weight: 500;
-      cursor: pointer;
-      transition: color 0.2s ease;
-    }
-
-    .nav-links a:hover {
-      color: var(--accent-diamond);
+    .logo span {
+      background: linear-gradient(to right, #fff, var(--accent-emerald));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .cart-btn {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
+      background: rgba(0, 230, 118, 0.1);
+      border: 1px solid var(--accent-emerald);
       color: var(--accent-emerald);
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--radius-lg);
       font-weight: 600;
-      cursor: pointer;
-    }
-
-    /* Hero Section */
-    .hero {
-      max-width: 1200px;
-      margin: 2rem auto;
-      padding: 3rem 2rem;
-      background: linear-gradient(135deg, #1b1e27 0%, #111318 100%);
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 2rem;
-      align-items: center;
-    }
-
-    .hero-content h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-      line-height: 1.2;
-    }
-
-    .hero-content span {
-      color: var(--accent-emerald);
-    }
-
-    .hero-content p {
-      color: var(--text-muted);
-      margin-bottom: 1.5rem;
-      font-size: 1.1rem;
-    }
-
-    .cta-btn {
-      background-color: var(--accent-emerald);
-      color: #05140b;
-      padding: 0.75rem 1.5rem;
-      border-radius: 6px;
-      font-weight: 700;
-      text-decoration: none;
-      display: inline-block;
-      border: none;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .cta-btn:hover {
-      background-color: var(--accent-emerald-hover);
-    }
-
-    /* Trust Banner */
-    .trust-banner {
-      background-color: var(--panel-bg);
-      border-top: 1px solid var(--border-color);
-      border-bottom: 1px solid var(--border-color);
-      padding: 1.2rem 2rem;
-    }
-
-    .trust-grid {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-around;
-      text-align: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .trust-item {
-      font-weight: 600;
-      color: var(--text-muted);
-      font-size: 0.95rem;
-    }
-
-    .trust-item span {
-      color: var(--accent-diamond);
-      margin-right: 0.4rem;
-    }
-
-    /* General Container & Category Grid */
-    .container {
-      max-width: 1200px;
-      margin: 3rem auto;
-      padding: 0 2rem;
-    }
-
-    .section-title {
-      font-size: 1.8rem;
-      margin-bottom: 1.5rem;
-      border-left: 4px solid var(--accent-emerald);
-      padding-left: 0.75rem;
-    }
-
-    .category-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 3.5rem;
-    }
-
-    .category-card {
-      background-color: var(--panel-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 1.5rem;
-      text-align: center;
-      cursor: pointer;
-      transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-
-    .category-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent-diamond);
-    }
-
-    /* Tab Controls */
-    .tabs-nav {
-      display: flex;
-      gap: 1rem;
-      border-bottom: 1px solid var(--border-color);
-      margin-bottom: 2rem;
-    }
-
-    .tab-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 1.1rem;
-      font-weight: 700;
-      padding: 0.8rem 1.5rem;
-      cursor: pointer;
-      position: relative;
-      transition: color 0.2s ease;
-    }
-
-    .tab-btn:hover {
-      color: var(--text-main);
-    }
-
-    .tab-btn.active {
-      color: var(--accent-emerald);
-    }
-
-    .tab-btn.active::after {
-      content: "";
-      position: absolute;
-      bottom: -1px;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background-color: var(--accent-emerald);
-      border-radius: 3px 3px 0 0;
-    }
-
-    .tab-pane {
-      display: none;
-    }
-
-    .tab-pane.active {
-      display: block;
-    }
-
-    /* Product Cards */
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 3.5rem;
-    }
-
-    .product-card {
-      background-color: var(--panel-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 1.2rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .image-placeholder {
-      width: 100%;
-      height: 180px;
-      background-color: var(--card-bg);
-      border: 2px dashed var(--border-color);
-      border-radius: 6px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      margin-bottom: 1rem;
-      text-align: center;
-      padding: 0.5rem;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-
-    .badge-diamond {
-      background-color: rgba(77, 238, 234, 0.15);
-      color: var(--accent-diamond);
-    }
-
-    .badge-book {
-      background-color: rgba(220, 100, 255, 0.15);
-      color: #df80ff;
-    }
-
-    .price-tag {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--accent-emerald);
-      margin: 0.8rem 0;
-    }
-
-    .upgrade-toggle {
+      transition: all 0.3s ease;
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      margin: 0.5rem 0;
-      font-size: 0.85rem;
-      color: var(--accent-netherite);
-      font-weight: 600;
-      cursor: pointer;
     }
 
-    .add-to-cart-btn {
+    .cart-btn:hover {
+      background: var(--accent-emerald);
+      color: var(--bg-base);
+      box-shadow: var(--shadow-neon);
+      transform: translateY(-1px);
+    }
+
+    .cart-badge {
+      background: var(--text-main);
+      color: var(--bg-base);
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .hero {
+      position: relative;
+      max-width: 1400px;
+      margin: 4rem auto;
+      padding: 6rem 2rem;
+      text-align: center;
+      overflow: hidden;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-glass);
+      background: radial-gradient(circle at 50% 50%, rgba(0,230,118,0.05) 0%, transparent 60%);
+    }
+
+    #particles-js {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
-      background-color: var(--card-bg);
-      border: 1px solid var(--accent-emerald);
-      color: var(--accent-emerald);
-      padding: 0.6rem;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      height: 100%;
+      z-index: var(--z-behind);
+      pointer-events: none;
     }
 
-    .add-to-cart-btn:hover {
-      background-color: var(--accent-emerald);
-      color: #05140b;
+    .hero-content {
+      position: relative;
+      z-index: var(--z-base);
     }
 
-    /* Footer */
-    footer {
-      background-color: var(--panel-bg);
-      border-top: 1px solid var(--border-color);
-      padding: 3rem 2rem;
+    .hero-badge {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-glass);
+      border-radius: 50px;
+      font-size: 0.85rem;
+      color: var(--accent-diamond);
+      margin-bottom: 1.5rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      font-size: clamp(3rem, 5vw, 5rem);
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      letter-spacing: -1px;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
       color: var(--text-muted);
-      font-size: 0.9rem;
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
     }
 
-    .footer-grid {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 2rem;
+    .section-container {
+      max-width: 1400px;
+      margin: 5rem auto;
+      padding: 0 2rem;
     }
 
-    .footer-col h4 {
-      color: var(--text-main);
-      margin-bottom: 1rem;
+    .section-header {
+      margin-bottom: 3rem;
+      text-align: center;
     }
 
-    .footer-col ul {
-      list-style: none;
-    }
-
-    .footer-col ul li {
+    .section-header h2 {
+      font-size: 2.5rem;
       margin-bottom: 0.5rem;
     }
 
-    @media (max-width: 768px) {
-      .hero {
-        grid-template-columns: 1fr;
-      }
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: 250px;
+      gap: 1.5rem;
+      margin-bottom: 4rem;
     }
-  </style>
+
+    .bento-card {
+      position: relative;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2rem;
+      transition: transform 0.3s ease, border-color 0.3s;
+      border: 1px solid var(--border-glass);
+      background: var(--bg-panel-solid);
+    }
+
+    .bento-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+      z-index: 1;
+    }
+
+    .bento-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent-emerald);
+    }
+
+    .bento-large { grid-column: span 2; }
+    .bento-content { position: relative; z-index: 2; }
+    .bento-content h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .bento-content p { color: var(--text-muted); font-size: 0.9rem; }
+
+    @media (max-width: 900px) {
+      .bento-grid { grid-template-columns: repeat(2, 1fr); }
+      .bento-large { grid-column: span 2; }
+    }
+    @media (max-width: 600px) {
+      .bento-grid { grid-template-columns: 1fr; }
+      .bento-large { grid-column: span 1; }
+    }
+
+    .filters {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-chip {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-glass);
+      padding: 0.5rem 1.5rem;
+      border-radius: 50px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+
+    .filter-chip:hover, .filter-chip.active {
+      background: var(--text-main);
+      color: var(--bg-base);
+      border-color: var(--text-main);
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    /* 3D Tilt Card Base */
+    .tilt-card {
+      position: relative;
+      border-radius: var(--radius-md);
+      background: var(--bg-panel);
+      border: 1px solid var(--border-glass);
+      padding: 1.5rem;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: border-color 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tilt-card:hover { border-color: var(--border-highlight); }
+    
+    .card-inner { transform: translateZ(30px); }
+
+    /* Skeleton & Image */
+    .image-container {
+      width: 100%;
+      height: 200px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 1.5rem;
+      background: #1a1d24;
+      border: 1px solid var(--border-glass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer; /* To trigger quick view */
+    }
+
+    .skeleton {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(90deg, #1a1d24 25%, #2a2d35 50%, #1a1d24 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      z-index: 2;
+      transition: opacity 0.5s ease;
+    }
+
+    .image-container.loaded .skeleton { opacity: 0; pointer-events: none; }
+    
+    .item-image {
+      width: 60%;
+      height: 60%;
+      object-fit: contain;
+      image-rendering: pixelated;
+      opacity: 0;
+      transition: opacity 0.5s ease, transform 0.3s ease;
+    }
+
+    .image-container.loaded .item-image { opacity: 1; }
+    .image-container:hover .item-image { transform: scale(1.1); }
+
+    /* Badges & Text */
+    .card-badges { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .badge {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .badge-diamond { background: rgba(0, 229, 255, 0.1); color: var(--accent-diamond); border: 1px solid rgba(0, 229, 255, 0.2); }
+    .badge-netherite { background: rgba(213, 0, 249, 0.1); color: var(--accent-netherite); border: 1px solid rgba(213, 0, 249, 0.2); }
+    .badge-arcana { background: rgba(255, 171, 0, 0.1); color: #ffab00; border: 1px solid rgba(255, 171, 0, 0.2); }
+
+    .item-title { font-size: 1.25rem; margin-bottom: 0.5rem; }
+    .item-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1; }
+    
+    /* Footer of Card */
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-glass);
+    }
+
+    .price { font-size: 1.2rem; font-weight: 700; color: var(--accent-emerald); }
+    .price span { font-size: 0.8rem; color: var(--text-muted); font-weight: normal; }
+
+    .add-btn {
+      background: transparent;
+      border: 1px solid var(--border-glass);
+      color: var(--text-main);
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s;
+    }
+    .add-btn:hover {
+      background: var(--accent-emerald);
+      border-color: var(--accent-emerald);
+      color: var(--bg-base);
+      transform: rotate(90deg);
+    }
+
+    /* Upgrade Toggle */
+    .upgrade-wrap {
+      display: flex; align-items: center; gap: 0.5rem;
+      margin-bottom: 1rem; font-size: 0.85rem; color: var(--text-muted);
+    }
+    .toggle-switch {
+      position: relative; width: 36px; height: 20px;
+      background: #2c303c; border-radius: 20px; cursor: pointer;
+      transition: 0.3s;
+    }
+    .toggle-switch::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 16px; height: 16px; background: #fff; border-radius: 50%;
+      transition: 0.3s;
+    }
+    input[type="checkbox"]:checked + .toggle-switch { background: var(--accent-netherite); }
+    input[type="checkbox"]:checked + .toggle-switch::after { transform: translateX(16px); }
+    .upgrade-wrap input { display: none; }
+
+    .cart-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+      z-index: calc(var(--z-cart) - 1);
+      opacity: 0; pointer-events: none; transition: 0.3s ease;
+    }
+    .cart-overlay.active { opacity: 1; pointer-events: all; }
+
+    .side-cart {
+      position: fixed; top: 0; right: -400px;
+      width: 100%; max-width: 400px; height: 100vh;
+      background: var(--bg-panel-solid);
+      border-left: 1px solid var(--border-glass);
+      z-index: var(--z-cart);
+      display: flex; flex-direction: column;
+      transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: var(--shadow-glass);
+    }
+    .side-cart.active { right: 0; }
+
+    .cart-header {
+      padding: 1.5rem; border-bottom: 1px solid var(--border-glass);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .close-cart { background: none; border: none; color: var(--text-main); font-size: 1.5rem; }
+
+    .cart-items { flex-grow: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    
+    .cart-item {
+      display: flex; gap: 1rem; align-items: center;
+      background: rgba(255,255,255,0.02); padding: 1rem;
+      border-radius: var(--radius-sm); border: 1px solid var(--border-glass);
+    }
+    .cart-item-img {
+      width: 50px; height: 50px; background: #1a1d24; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cart-item-info { flex-grow: 1; }
+    .cart-item-title { font-size: 0.9rem; font-weight: 600; }
+    .cart-item-price { font-size: 0.85rem; color: var(--accent-emerald); }
+    .remove-item { color: #ff4d4d; background: none; border: none; cursor: pointer; font-size: 0.8rem; }
+
+    .cart-footer {
+      padding: 1.5rem; border-top: 1px solid var(--border-glass); background: rgba(0,0,0,0.2);
+    }
+    .cart-total { display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; }
+    .checkout-btn {
+      width: 100%; padding: 1rem; background: var(--accent-emerald);
+      color: var(--bg-base); border: none; border-radius: var(--radius-sm);
+      font-weight: 700; font-size: 1rem; transition: 0.3s;
+    }
+    .checkout-btn:hover { background: #00c853; box-shadow: var(--shadow-neon); }
+
+    .toast-container {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: var(--z-toast);
+      display: flex; flex-direction: column; gap: 1rem; pointer-events: none;
+    }
+    .toast {
+      background: var(--bg-panel); border: 1px solid var(--border-glass);
+      backdrop-filter: blur(12px); padding: 1rem 1.5rem; border-radius: var(--radius-sm);
+      display: flex; align-items: center; gap: 1rem; color: var(--text-main);
+      box-shadow: var(--shadow-glass); animation: slideInRight 0.3s forwards; pointer-events: all;
+    }
+    .toast::before { content: '✓'; color: var(--accent-emerald); font-weight: bold; }
+
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+      z-index: var(--z-modal); display: none; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .modal-overlay.active { display: flex; opacity: 1; }
+    
+    .quick-view-modal {
+      background: var(--bg-panel-solid); border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md); width: 90%; max-width: 800px;
+      display: grid; grid-template-columns: 1fr 1fr; overflow: hidden;
+      transform: scale(0.95); transition: transform 0.3s; box-shadow: var(--shadow-glass);
+    }
+    .modal-overlay.active .quick-view-modal { transform: scale(1); }
+    
+    .modal-image { background: radial-gradient(circle, #2a2d35 0%, #121319 100%); display: flex; align-items: center; justify-content: center; padding: 3rem; }
+    .modal-image img { width: 100%; max-width: 250px; image-rendering: pixelated; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); animation: float 4s ease-in-out infinite; }
+    .modal-info { padding: 3rem; position: relative; }
+    .modal-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; transition: 0.2s; }
+    .modal-close:hover { color: #fff; transform: rotate(90deg); }
+
+    @media (max-width: 768px) {
+      .quick-view-modal { grid-template-columns: 1fr; }
+      .modal-image { padding: 2rem; }
+      .modal-info { padding: 2rem; }
+    }
+
+    /* AI Chat System */
+    .ai-chat-btn {
+      position: fixed; bottom: 2rem; left: 2rem; z-index: var(--z-modal);
+      width: 60px; height: 60px; border-radius: 50%;
+      background: var(--bg-panel); border: 2px solid var(--accent-diamond);
+      box-shadow: var(--shadow-neon); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1.8rem; transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+    }
+    .ai-chat-btn:hover { transform: scale(1.1); border-color: var(--accent-emerald); }
+    
+    .ai-chat-window {
+      position: fixed; bottom: 6rem; left: 2rem; z-index: var(--z-modal);
+      width: 350px; height: 450px; background: var(--bg-panel-solid);
+      border: 1px solid var(--border-glass); border-radius: var(--radius-md);
+      box-shadow: var(--shadow-glass); display: flex; flex-direction: column;
+      transform: translateY(20px) scale(0.95); opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transform-origin: bottom left;
+    }
+    .ai-chat-window.active { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
+    
+    .chat-header {
+      padding: 1rem; border-bottom: 1px solid var(--border-glass);
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(0, 230, 118, 0.05); border-radius: var(--radius-md) var(--radius-md) 0 0;
+    }
+    .chat-messages {
+      flex-grow: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem;
+    }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .msg { max-width: 85%; padding: 0.8rem 1rem; border-radius: var(--radius-sm); font-size: 0.9rem; line-height: 1.4; word-wrap: break-word; }
+    .msg.user { align-self: flex-end; background: #2c303c; color: #fff; border-bottom-right-radius: 2px; }
+    .msg.ai { align-self: flex-start; background: rgba(0, 230, 118, 0.1); border: 1px solid var(--border-glass); color: #fff; border-bottom-left-radius: 2px; }
+    
+    .chat-input {
+      padding: 1rem; border-top: 1px solid var(--border-glass); display: flex; gap: 0.5rem;
+      background: var(--bg-panel); border-radius: 0 0 var(--radius-md) var(--radius-md);
+    }
+    .chat-input input {
+      flex-grow: 1; padding: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--border-glass);
+      background: #1a1d24; color: #fff; outline: none; transition: border-color 0.2s;
+    }
+    .chat-input input:focus { border-color: var(--accent-emerald); }
+    .chat-input button {
+      padding: 0.8rem 1.2rem; background: var(--accent-emerald); border: none;
+      border-radius: var(--radius-sm); color: var(--bg-base); font-weight: bold; cursor: pointer; transition: 0.2s;
+    }
+    .chat-input button:hover { background: #00c853; }
+    
+    .lore-btn {
+      background: linear-gradient(135deg, #d500f9 0%, #00e5ff 100%);
+      border: none; color: white; padding: 0.6rem 1.2rem; border-radius: var(--radius-sm);
+      font-weight: 600; cursor: pointer; font-size: 0.85rem; margin-bottom: 1.5rem;
+      display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.3s ease;
+    }
+    .lore-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(213, 0, 249, 0.4); }
+    .lore-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+  <title>WandyT Company | Premium Armory & Arcana</title>
 </head>
 <body>
 
-  <!-- Top Navigation -->
-  <header>
+  <!-- Custom Cursor Element with Fallback -->
+  <img src="./pngfind.com-minecraft-pickaxe-png-2443801.png" id="custom-cursor" alt="" onerror="this.onerror=null; this.style.display='none'; document.body.classList.remove('custom-cursor-active');">
+
+  <header class="glass" id="header">
     <div class="nav-container">
       <div class="logo">
-        <!-- Pixel-Art Minecraft Llama Face SVG -->
-        <svg class="llama-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Ears -->
-          <rect x="2" y="0" width="3" height="4" fill="#a89279"/>
-          <rect x="11" y="0" width="3" height="4" fill="#a89279"/>
-          <rect x="3" y="1" width="1" height="2" fill="#5c4e3e"/>
-          <rect x="12" y="1" width="1" height="2" fill="#5c4e3e"/>
-          <!-- Head Base -->
-          <rect x="2" y="3" width="12" height="12" fill="#c4b29a"/>
-          <rect x="3" y="4" width="10" height="10" fill="#dfd3be"/>
-          <!-- Forehead / Wool Shading -->
-          <rect x="4" y="4" width="8" height="3" fill="#eae3d2"/>
-          <!-- Eyes -->
-          <rect x="2" y="7" width="3" height="2" fill="#2d231b"/>
-          <rect x="2" y="7" width="1" height="1" fill="#ffffff"/>
-          <rect x="11" y="7" width="3" height="2" fill="#2d231b"/>
-          <rect x="13" y="7" width="1" height="1" fill="#ffffff"/>
-          <!-- Snout / Muzzle -->
-          <rect x="5" y="8" width="6" height="6" fill="#8f7c66"/>
-          <rect x="6" y="9" width="4" height="4" fill="#6f5e4c"/>
-          <!-- Nostrils -->
-          <rect x="6" y="10" width="1" height="1" fill="#2b231d"/>
-          <rect x="9" y="10" width="1" height="1" fill="#2b231d"/>
-          <!-- Mouth -->
-          <rect x="7" y="12" width="2" height="1" fill="#3a2e26"/>
-          <!-- Cheek Tufts -->
-          <rect x="1" y="8" width="1" height="3" fill="#b09f87"/>
-          <rect x="14" y="8" width="1" height="3" fill="#b09f87"/>
-        </svg>
-        <span>WandyT Company</span>
+        <img src="./big-llama-face.jpg" alt="WandyT Logo" class="llama-logo" onerror="this.onerror=null; this.src='https://placehold.co/40x40/181a20/00e676?text=WT';">
+        <span>WandyT Armory</span>
       </div>
-      <ul class="nav-links">
-        <li><a onclick="switchTab('tools-tab')">Tools</a></li>
-        <li><a onclick="switchTab('armor-tab')">Armour</a></li>
-        <li><a onclick="switchTab('librarian-tab')">Librarian Vault</a></li>
-      </ul>
-      <button class="cart-btn" id="cart-counter">🛒 Cart (0 EME)</button>
+      <button class="cart-btn" onclick="toggleCart()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+        Cart <span class="cart-badge" id="cart-count">0</span>
+      </button>
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <section class="hero">
+  <section class="hero reveal">
+    <div id="particles-js"></div>
     <div class="hero-content">
-      <h1>Forged for the Deep Dark, <span>Enchanted for Eternity</span></h1>
-      <p>Equip yourself with Diamond and Netherite-grade equipment from WandyT Company. Certified curse-free by the Village Cleric Guild.</p>
-      <button class="cta-btn" onclick="switchTab('tools-tab'); document.getElementById('catalog').scrollIntoView({behavior: 'smooth'});">
-        Browse the Anvil Armory
-      </button>
-    </div>
-    <div class="image-placeholder">
-      <strong>[ PASTE HERO BANNER / FORGE ARTWORK HERE ]</strong>
-      <span>Recommended: 600x350px PNG</span>
+      <div class="hero-badge">Curse-Free Certification</div>
+      <h1>Forged in the Deep Dark,<br><span class="gradient-text">Enchanted for Eternity.</span></h1>
+      <p>Equip yourself with premium Diamond and Netherite-grade armaments. Delivered instantly via Ender Chest Sync protocol.</p>
     </div>
   </section>
 
-  <!-- Trust Banner -->
-  <div class="trust-banner">
-    <div class="trust-grid">
-      <div class="trust-item"><span>🛡️</span> 100% Curse-Free Guarantee</div>
-      <div class="trust-item"><span>📦</span> Ender Chest Sync (Instant Delivery)</div>
-      <div class="trust-item"><span>📜</span> Cleric Guild Certified Arcana</div>
-      <div class="trust-item"><span>⛏️</span> Repairable at any Standard Anvil</div>
+  <section class="section-container reveal">
+    <div class="section-header">
+      <h2>Department Overview</h2>
+    </div>
+    <div class="bento-grid">
+      <div class="bento-card bento-large" style="background: url('https://placehold.co/800x400/181a20/ffffff?text=Combat+Division') center/cover;">
+        <div class="bento-content">
+          <h3>Combat & Defense</h3>
+          <p>Full plate sets forged for Warden raids.</p>
+        </div>
+      </div>
+      <div class="bento-card" style="background: url('https://placehold.co/400x400/181a20/00e676?text=Mining') center/cover;">
+        <div class="bento-content">
+          <h3>Excavation</h3>
+          <p>Heavy yield tools.</p>
+        </div>
+      </div>
+      <div class="bento-card" style="background: url('https://placehold.co/400x400/181a20/d500f9?text=Arcana') center/cover;">
+        <div class="bento-content">
+          <h3>Librarian's Vault</h3>
+          <p>Forbidden enchantments.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-container" id="catalog">
+    <div class="filters reveal">
+      <button class="filter-chip active" data-filter="all">All Inventory</button>
+      <button class="filter-chip" data-filter="diamond">Diamond Tier</button>
+      <button class="filter-chip" data-filter="netherite">Netherite Upgrades</button>
+      <button class="filter-chip" data-filter="arcana">Arcana Tomes</button>
+    </div>
+
+    <div class="product-grid" id="product-grid">
+      <!-- Tool: Pickaxe -->
+      <div class="tilt-card reveal" data-category="diamond netherite" data-id="p1">
+        <div class="card-inner">
+          <div class="image-container" onclick="openQuickView('p1')">
+            <div class="skeleton"></div>
+            <!-- Using emoji/svg via data URI for premium feel without external images -->
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='50%' x='50%' dominant-baseline='middle' text-anchor='middle' font-size='60'>⛏️</text></svg>" class="item-image" alt="Pickaxe">
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-diamond tier-badge">Diamond</span>
+          </div>
+          <h3 class="item-title">Excavator Pickaxe</h3>
+          <p class="item-desc">Efficiency V, Unbreaking III</p>
+          
+          <label class="upgrade-wrap">
+            <input type="checkbox" onchange="toggleTier(this, 'p1', 32, 24)">
+            <div class="toggle-switch"></div>
+            <span>Netherite Plating (+24 EME)</span>
+          </label>
+          
+          <div class="card-footer">
+            <div class="price"><span class="price-val">32</span> <span>EME</span></div>
+            <button class="add-btn" onclick="addToCart('p1', 'Excavator Pickaxe', 32, this)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Armor: Chestplate -->
+      <div class="tilt-card reveal" data-category="diamond netherite" data-id="a1">
+        <div class="card-inner">
+          <div class="image-container" onclick="openQuickView('a1')">
+            <div class="skeleton"></div>
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='50%' x='50%' dominant-baseline='middle' text-anchor='middle' font-size='60'>👕</text></svg>" class="item-image" alt="Chestplate">
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-diamond tier-badge">Diamond</span>
+          </div>
+          <h3 class="item-title">Bastion Bulwark</h3>
+          <p class="item-desc">Protection IV, Unbreaking III</p>
+          
+          <label class="upgrade-wrap">
+            <input type="checkbox" onchange="toggleTier(this, 'a1', 40, 32)">
+            <div class="toggle-switch"></div>
+            <span>Netherite Plating (+32 EME)</span>
+          </label>
+          
+          <div class="card-footer">
+            <div class="price"><span class="price-val">40</span> <span>EME</span></div>
+            <button class="add-btn" onclick="addToCart('a1', 'Bastion Bulwark', 40, this)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arcana: Mending -->
+      <div class="tilt-card reveal" data-category="arcana" data-id="b1">
+        <div class="card-inner">
+          <div class="image-container" onclick="openQuickView('b1')">
+            <div class="skeleton"></div>
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='50%' x='50%' dominant-baseline='middle' text-anchor='middle' font-size='60'>📘</text></svg>" class="item-image" alt="Book">
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-arcana">Forbidden</span>
+          </div>
+          <h3 class="item-title">Tome of Mending</h3>
+          <p class="item-desc">Restores item durability using gathered experience orbs.</p>
+          
+          <div style="height: 36px; margin-bottom: 1rem;"></div> <!-- Spacer for alignment -->
+          
+          <div class="card-footer">
+            <div class="price"><span class="price-val">48</span> <span>EME</span></div>
+            <button class="add-btn" onclick="addToCart('b1', 'Tome of Mending', 48, this)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arcana: Swift Sneak -->
+      <div class="tilt-card reveal" data-category="arcana" data-id="b2">
+        <div class="card-inner">
+          <div class="image-container" onclick="openQuickView('b2')">
+            <div class="skeleton"></div>
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='50%' x='50%' dominant-baseline='middle' text-anchor='middle' font-size='60'>📓</text></svg>" class="item-image" alt="Book">
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-arcana">Relic</span>
+          </div>
+          <h3 class="item-title">Swift Sneak III</h3>
+          <p class="item-desc">Walk at full operational speed while crouching.</p>
+          
+          <div style="height: 36px; margin-bottom: 1rem;"></div>
+          
+          <div class="card-footer">
+            <div class="price"><span class="price-val">45</span> <span>EME</span></div>
+            <button class="add-btn" onclick="addToCart('b2', 'Swift Sneak III', 45, this)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+  <aside class="side-cart" id="side-cart">
+    <div class="cart-header">
+      <h3>Ender Chest</h3>
+      <button class="close-cart" onclick="toggleCart()">×</button>
+    </div>
+    <div class="cart-items" id="cart-items-container">
+      <!-- Items injected via JS -->
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total:</span>
+        <span><span id="cart-total-val">0</span> EME</span>
+      </div>
+      <button class="checkout-btn">Initiate Chunk Delivery</button>
+    </div>
+  </aside>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <div class="modal-overlay" id="quick-view-overlay" onclick="closeQuickView(event)">
+    <div class="quick-view-modal glass">
+      <button class="modal-close" onclick="closeQuickView(event, true)">×</button>
+      <div class="modal-image">
+        <img id="qv-img" src="" alt="Item">
+      </div>
+      <div class="modal-info">
+        <div class="card-badges" id="qv-badges"></div>
+        <h2 id="qv-title" style="margin-bottom: 1rem; font-size: 2rem;">Item Title</h2>
+        <p id="qv-desc" style="color: var(--text-muted); margin-bottom: 1rem; line-height: 1.8;">Item Description</p>
+        
+        <button class="lore-btn" id="generate-lore-btn" onclick="generateLore()">
+          ✨ Translate Ancient Lore (AI)
+        </button>
+
+        <div style="padding: 1rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); margin-bottom: 2rem;">
+          <h4 style="color: var(--accent-emerald); margin-bottom: 0.5rem;">Cleric Guild Notes:</h4>
+          <p style="font-size: 0.85rem; color: #aaa;">Certified curse-free. Safe for Anvil combination up to level 39.</p>
+        </div>
+        <div class="price" style="font-size: 1.5rem;"><span id="qv-price">0</span> <span>EME</span></div>
+      </div>
     </div>
   </div>
 
-  <main class="container" id="catalog">
-    <!-- Category Grid / Interactive Switchers -->
-    <h2 class="section-title">Armory Department</h2>
-    <div class="category-grid">
-      <div class="category-card" onclick="switchTab('tools-tab')">
-        <h3>Mining & Excavation</h3>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Pickaxes, axes, and trench shovels built for heavy yield.</p>
-      </div>
-      <div class="category-card" onclick="switchTab('armor-tab')">
-        <h3>Combat & Defense</h3>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Full plate sets forged for Nether and Warden raids.</p>
-      </div>
-      <div class="category-card" onclick="switchTab('librarian-tab')">
-        <h3>Librarian's Vault</h3>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">High-potency tomes, mending scrolls, and swift sneak arcana.</p>
-      </div>
+  <!-- AI Chat System -->
+  <div class="ai-chat-btn" onclick="toggleAIChat()" title="Ask the Guild Cleric">🧙‍♂️</div>
+  <div class="ai-chat-window glass" id="ai-chat-window">
+    <div class="chat-header">
+      <h3 style="font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-main);">
+        <span style="font-size: 1.2rem;">🧙‍♂️</span> Guild Cleric
+      </h3>
+      <button class="modal-close" style="position: static;" onclick="toggleAIChat()">×</button>
     </div>
-
-    <!-- Tab Selector -->
-    <div class="tabs-nav">
-      <button class="tab-btn active" id="btn-tools-tab" onclick="switchTab('tools-tab')">Tools</button>
-      <button class="tab-btn" id="btn-armor-tab" onclick="switchTab('armor-tab')">Armour</button>
-      <button class="tab-btn" id="btn-librarian-tab" onclick="switchTab('librarian-tab')">Librarian Vault</button>
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg ai">Greetings, traveler. I am the Guild Cleric. Seek ye advice on armaments for thy next raid?</div>
     </div>
-
-    <!-- TAB 1: TOOLS -->
-    <div class="tab-pane active" id="tools-tab">
-      <div class="product-grid">
-        <!-- Pickaxe -->
-        <div class="product-card" data-base-price="32" data-upgrade-cost="24">
-          <div class="image-placeholder">
-            <strong>[ PASTE PICKAXE IMAGE HERE ]</strong>
-          </div>
-          <span class="badge badge-diamond item-badge">Diamond Tier</span>
-          <h3 class="item-title">Excavator Pickaxe</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Efficiency V, Unbreaking III</p>
-          <label class="upgrade-toggle">
-            <input type="checkbox" onchange="toggleNetherite(this)" />
-            Upgrade to Netherite (+24 EME)
-          </label>
-          <div class="price-tag">Price: <span class="current-price">32</span> Emeralds</div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
-        </div>
-
-        <!-- Axe -->
-        <div class="product-card" data-base-price="28" data-upgrade-cost="24">
-          <div class="image-placeholder">
-            <strong>[ PASTE AXE IMAGE HERE ]</strong>
-          </div>
-          <span class="badge badge-diamond item-badge">Diamond Tier</span>
-          <h3 class="item-title">Timber & Cleave Axe</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Sharpness V, Efficiency IV</p>
-          <label class="upgrade-toggle">
-            <input type="checkbox" onchange="toggleNetherite(this)" />
-            Upgrade to Netherite (+24 EME)
-          </label>
-          <div class="price-tag">Price: <span class="current-price">28</span> Emeralds</div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
-        </div>
-
-        <!-- Shovel -->
-        <div class="product-card" data-base-price="16" data-upgrade-cost="20">
-          <div class="image-placeholder">
-            <strong>[ PASTE SHOVEL IMAGE HERE ]</strong>
-          </div>
-          <span class="badge badge-diamond item-badge">Diamond Tier</span>
-          <h3 class="item-title">Dune Trench Shovel</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Silk Touch I, Unbreaking III</p>
-          <label class="upgrade-toggle">
-            <input type="checkbox" onchange="toggleNetherite(this)" />
-            Upgrade to Netherite (+20 EME)
-          </label>
-          <div class="price-tag">Price: <span class="current-price">16</span> Emeralds</div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
-        </div>
-      </div>
+    <div class="chat-input">
+      <input type="text" id="chat-input-field" placeholder="Ask for gear advice..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
+      <button onclick="sendChatMessage()">Send</button>
     </div>
+  </div>
 
-    <!-- TAB 2: ARMOUR -->
-    <div class="tab-pane" id="armor-tab">
-      <div class="product-grid">
-        <!-- Helmet -->
-        <div class="product-card" data-base-price="24" data-upgrade-cost="28">
-          <div class="image-placeholder">
-            <strong>[ PASTE HELMET IMAGE HERE ]</strong>
-          </div>
-          <span class="badge badge-diamond item-badge">Diamond Tier</span>
-          <h3 class="item-title">Crown of the Abyss</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Respiration III, Aqua Affinity</p>
-          <label class="upgrade-toggle">
-            <input type="checkbox" onchange="toggleNetherite(this)" />
-            Upgrade to Netherite (+28 EME)
-          </label>
-          <div class="price-tag">Price: <span class="current-price">24</span> Emeralds</div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
-        </div>
-
-        <!-- Chestplate -->
-        <div class="product-card" data-base-price="40" data-upgrade-cost="32">
-          <div class="image-placeholder">
-            <strong>[ PASTE CHESTPLATE IMAGE HERE ]</strong>
-          </div>
-          <span class="badge badge-diamond item-badge">Diamond Tier</span>
-          <h3 class="item-title">Bastion Bulwark</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Protection IV, Unbreaking III</p>
-          <label class="upgrade-toggle">
-            <input type="checkbox" onchange="toggleNetherite(this)" />
-            Upgrade to Netherite (+32 EME)
-          </label>
-          <div class="price-tag">Price: <span class="current-price">40</span> Emeralds</div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
-        </div>
-
-        <!-- Leggings -->
-        <div class="product-card" data-base-price="34" data-upgrade-cost="30">
-          <div class="image-placeholder">
-            <strong>[ PASTE LEGGINGS IMAGE HERE ]</strong>
-          </div>
-          <span class="badge badge-diamond item-badge">Diamond Tier</span>
-          <h3 class="item-title">Stride Greaves</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Swift Sneak III, Protection IV</p>
-          <label class="upgrade-toggle">
-            <input type="checkbox" onchange="toggleNetherite(this)" />
-            Upgrade to Netherite (+30 EME)
-          </label>
-          <div class="price-tag">Price: <span class="current-price">34</span> Emeralds</div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
-        </div>
-
-        <!-- Boots -->
-        <div class="product-card" data-base-price="20" data-upgrade-cost="28">
-          <div class="image-placeholder">
-            <strong>[ PASTE BOOTS IMAGE HERE ]</strong>
-          </div>
-          <span class="badge badge-diamond item-badge">Diamond Tier</span>
-          <h3 class="item-title">Cloudwalkers</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Feather Falling IV, Soul Speed III</p>
-          <label class="upgrade-toggle">
-            <input type="checkbox" onchange="toggleNetherite(this)" />
-            Upgrade to Netherite (+28 EME)
-          </label>
-          <div class="price-tag">Price: <span class="current-price">20</span> Emeralds</div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 3: LIBRARIAN VAULT -->
-    <div class="tab-pane" id="librarian-tab">
-      <div class="product-grid">
-        <!-- Mending -->
-        <div class="product-card" data-base-price="48">
-          <div class="image-placeholder">
-            <strong>[ PASTE ENCHANTED BOOK IMAGE HERE ]</strong>
-          </div>
-          <span class="badge badge-book">Forbidden Arcana</span>
-          <h3 class="item-title">Tome of Mending</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Restores item durability using gathered experience orbs.</p>
-          <div class="price-tag">Price: <span class="current-price">48</span> Emeralds</div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
-        </div>
-
-        <!-- Fortune III -->
-        <div class="product-card" data-base-price="36">
-          <div class="image-placeholder">
-            <strong>[ PASTE ENCHANTED BOOK IMAGE HERE ]</strong>
-          </div>
-          <span class="badge badge-book">Resource Arcana</span>
-          <h3 class="item-title">Tome of Fortune III</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Multiplies raw drop yields from diamond, gold, and coal ores.</p>
-          <div class="price-tag">Price: <span class="current-price">36</span> Emeralds</div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
-        </div>
-
-        <!-- Silk Touch -->
-        <div class="product-card" data-base-price="32">
-          <div class="image-placeholder">
-            <strong>[ PASTE ENCHANTED BOOK IMAGE HERE ]</strong>
-          </div>
-          <span class="badge badge-book">Excavation Arcana</span>
-          <h3 class="item-title">Tome of Silk Touch</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Mines fragile blocks intact (ice, glass, campfires, and ores).</p>
-          <div class="price-tag">Price: <span class="current-price">32</span> Emeralds</div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
-        </div>
-
-        <!-- Looting III -->
-        <div class="product-card" data-base-price="42">
-          <div class="image-placeholder">
-            <strong>[ PASTE ENCHANTED BOOK IMAGE HERE ]</strong>
-          </div>
-          <span class="badge badge-book">Combat Arcana</span>
-          <h3 class="item-title">Tome of Looting III</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Increases mob loot quantity and rare drop probabilities.</p>
-          <div class="price-tag">Price: <span class="current-price">42</span> Emeralds</div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
-        </div>
-
-        <!-- Feather Falling IV -->
-        <div class="product-card" data-base-price="28">
-          <div class="image-placeholder">
-            <strong>[ PASTE ENCHANTED BOOK IMAGE HERE ]</strong>
-          </div>
-          <span class="badge badge-book">Survival Arcana</span>
-          <h3 class="item-title">Tome of Feather Falling IV</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Reduces vertical fall damage and pearl teleportation impacts.</p>
-          <div class="price-tag">Price: <span class="current-price">28</span> Emeralds</div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
-        </div>
-
-        <!-- Infinity -->
-        <div class="product-card" data-base-price="30">
-          <div class="image-placeholder">
-            <strong>[ PASTE ENCHANTED BOOK IMAGE HERE ]</strong>
-          </div>
-          <span class="badge badge-book">Archery Arcana</span>
-          <h3 class="item-title">Tome of Infinity</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Fires unlimited arrows without depleting quiver inventory.</p>
-          <div class="price-tag">Price: <span class="current-price">30</span> Emeralds</div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
-        </div>
-
-        <!-- Sharpness V -->
-        <div class="product-card" data-base-price="38">
-          <div class="image-placeholder">
-            <strong>[ PASTE ENCHANTED BOOK IMAGE HERE ]</strong>
-          </div>
-          <span class="badge badge-book">Combat Arcana</span>
-          <h3 class="item-title">Tome of Sharpness V</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Imbues melee weapons with maximum physical cutting damage.</p>
-          <div class="price-tag">Price: <span class="current-price">38</span> Emeralds</div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
-        </div>
-
-        <!-- Swift Sneak III -->
-        <div class="product-card" data-base-price="45">
-          <div class="image-placeholder">
-            <strong>[ PASTE ENCHANTED BOOK IMAGE HERE ]</strong>
-          </div>
-          <span class="badge badge-book">Ancient City Relic</span>
-          <h3 class="item-title">Tome of Swift Sneak III</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Walk at full operational speed while remaining completely crouched.</p>
-          <div class="price-tag">Price: <span class="current-price">45</span> Emeralds</div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- Footer -->
-  <footer>
-    <div class="footer-grid">
-      <div class="footer-col">
-        <h4>WandyT Company Warranty</h4>
-        <ul>
-          <li>Free Grindstone Disenchantments</li>
-          <li>30-Day Netherite Structural Guarantee</li>
-          <li>Anvil Overheat & Shatter Protection</li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Logistics & Delivery</h4>
-        <ul>
-          <li>Ender Chest Protocol</li>
-          <li>Allay Express (Chunk Delivery)</li>
-          <li>Wandering Trader Tracking</li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Cleric Guild Compliance</h4>
-        <ul>
-          <li>Curse of Vanishing Verification</li>
-          <li>Fair Emerald Trading Standards</li>
-          <li>Village Raiding Insurance</li>
-        </ul>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Interactive Logic -->
   <script>
-    let totalEmeralds = 0;
+    // System State
+    let cart = [];
+    
+    function initCustomCursor() {
+      const cursor = document.getElementById('custom-cursor');
+      if (!cursor) return;
+      
+      const enableCursor = () => {
+        document.body.classList.add('custom-cursor-active');
+        cursor.style.display = 'block';
+      };
+      
+      // Only enable custom cursor if image loads successfully to prevent blind UX
+      if (cursor.complete && cursor.naturalHeight !== 0) {
+        enableCursor();
+      } else {
+        cursor.onload = enableCursor;
+      }
+      
+      // Track mouse movement
+      document.addEventListener('mousemove', (e) => {
+        // Offset slightly (-4px) to align the pickaxe tip with the true click point
+        cursor.style.transform = `translate(${e.clientX - 4}px, ${e.clientY - 4}px)`;
+      });
 
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-
-      const targetPane = document.getElementById(tabId);
-      const targetBtn = document.getElementById('btn-' + tabId);
-
-      if (targetPane) targetPane.classList.add('active');
-      if (targetBtn) targetBtn.classList.add('active');
+      // Add glow and scale effects when hovering over interactive elements
+      const clickables = document.querySelectorAll('button, a, input, .image-container, .filter-chip, .ai-chat-btn, .toggle-switch');
+      clickables.forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('active'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('active'));
+      });
     }
 
-    function toggleNetherite(checkbox) {
-      const card = checkbox.closest('.product-card');
-      const basePrice = parseInt(card.getAttribute('data-base-price'));
-      const upgradeCost = parseInt(card.getAttribute('data-upgrade-cost'));
-      const priceDisplay = card.querySelector('.current-price');
-      const badge = card.querySelector('.item-badge');
+    // Initialize functions on load
+    document.addEventListener("DOMContentLoaded", () => {
+      initCustomCursor();
+      initSkeletons();
+      initObservers();
+      initTilt();
+      initFilters();
+      createParticles();
+      
+      // Load cart from LocalStorage
+      const savedCart = localStorage.getItem('wandyt_cart');
+      if (savedCart) {
+        cart = JSON.parse(savedCart);
+        updateCartUI();
+      }
+    });
 
-      if (checkbox.checked) {
-        priceDisplay.textContent = basePrice + upgradeCost;
-        badge.textContent = 'Netherite Tier';
-        badge.style.color = '#df80ff';
-        badge.style.backgroundColor = 'rgba(223, 128, 255, 0.15)';
-      } else {
-        priceDisplay.textContent = basePrice;
-        badge.textContent = 'Diamond Tier';
-        badge.style.color = 'var(--accent-diamond)';
-        badge.style.backgroundColor = 'rgba(77, 238, 234, 0.15)';
+    // Skeleton loaders timeout (simulating image load)
+    function initSkeletons() {
+      setTimeout(() => {
+        document.querySelectorAll('.image-container').forEach(el => {
+          el.classList.add('loaded');
+        });
+      }, 2000);
+    }
+
+    // Scroll Reveal Observer
+    function initObservers() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    }
+
+    function initTilt() {
+      const cards = document.querySelectorAll('.tilt-card');
+      
+      cards.forEach(card => {
+        card.addEventListener('mousemove', e => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          
+          const rotateX = ((y - centerY) / centerY) * -4; // Toned down from 10 deg
+          const rotateY = ((x - centerX) / centerX) * 4;  // Toned down from 10 deg
+          
+          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.01, 1.01, 1.01)`;
+        });
+        
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+          card.style.transition = 'transform 0.5s ease';
+        });
+        
+        card.addEventListener('mouseenter', () => {
+          card.style.transition = 'none'; // remove transition for smooth tracking
+        });
+      });
+    }
+
+    function createParticles() {
+      const container = document.getElementById('particles-js');
+      const particleCount = 15; // Halved for subtlety
+      
+      for(let i=0; i<particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.style.position = 'absolute';
+        particle.style.width = Math.random() * 4 + 'px';
+        particle.style.height = particle.style.width;
+        particle.style.background = Math.random() > 0.5 ? 'var(--accent-emerald)' : 'var(--accent-diamond)';
+        particle.style.borderRadius = '50%';
+        particle.style.opacity = Math.random() * 0.3; // Toned down opacity
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animation = `float ${Math.random() * 6 + 5}s ease-in-out infinite`; // Slower movement
+        particle.style.animationDelay = `${Math.random() * 2}s`;
+        container.appendChild(particle);
       }
     }
 
-    function addToCart(button) {
-      const card = button.closest('.product-card');
-      const price = parseInt(card.querySelector('.current-price').textContent);
-      totalEmeralds += price;
-      
-      const cartBtn = document.getElementById('cart-counter');
-      cartBtn.textContent = `🛒 Cart (${totalEmeralds} EME)`;
+    function initFilters() {
+      const chips = document.querySelectorAll('.filter-chip');
+      const items = document.querySelectorAll('.tilt-card');
 
-      const originalText = button.textContent;
-      button.textContent = "Added to Ender Chest!";
-      button.style.backgroundColor = "var(--accent-emerald)";
-      button.style.color = "#05140b";
+      chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          // Update active chip
+          chips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          
+          const filter = chip.getAttribute('data-filter');
+          
+          items.forEach(item => {
+            const categories = item.getAttribute('data-category');
+            if (filter === 'all' || categories.includes(filter)) {
+              item.style.display = 'flex';
+              setTimeout(() => item.classList.add('active'), 50); // re-trigger animation
+            } else {
+              item.style.display = 'none';
+              item.classList.remove('active');
+            }
+          });
+        });
+      });
+    }
+
+    // Handle Tier Upgrade
+    function toggleTier(checkbox, id, basePrice, upgradeCost) {
+      const card = checkbox.closest('.tilt-card');
+      const priceDisplay = card.querySelector('.price-val');
+      const badge = card.querySelector('.tier-badge');
+      const addBtn = card.querySelector('.add-btn');
+      
+      let currentPrice = basePrice;
+      let isNetherite = checkbox.checked;
+
+      if (isNetherite) {
+        currentPrice = basePrice + upgradeCost;
+        badge.textContent = 'Netherite';
+        badge.className = 'badge badge-netherite tier-badge';
+        card.style.borderColor = 'var(--accent-netherite)';
+      } else {
+        badge.textContent = 'Diamond';
+        badge.className = 'badge badge-diamond tier-badge';
+        card.style.borderColor = 'var(--border-glass)';
+      }
+      
+      priceDisplay.textContent = currentPrice;
+      
+      // Update onclick function
+      const title = card.querySelector('.item-title').textContent;
+      const finalName = isNetherite ? `Netherite ${title.split(' ')[0]}` : title;
+      
+      addBtn.setAttribute('onclick', `addToCart('${id}', '${finalName}', ${currentPrice}, this)`);
+    }
+
+    function addToCart(id, name, price, btnElement) {
+      // Check if exists
+      const existing = cart.find(item => item.id === id && item.name === name);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ id, name, price, qty: 1 });
+      }
+      
+      saveCart();
+      updateCartUI();
+      showToast(`${name} added to Ender Chest`);
+      
+      // Button effect
+      if(btnElement) {
+        const ogHTML = btnElement.innerHTML;
+        btnElement.innerHTML = '✓';
+        btnElement.style.background = 'var(--accent-emerald)';
+        btnElement.style.color = 'var(--bg-base)';
+        setTimeout(() => {
+          btnElement.innerHTML = ogHTML;
+          btnElement.style.background = '';
+          btnElement.style.color = '';
+        }, 1000);
+      }
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      saveCart();
+      updateCartUI();
+    }
+
+    function saveCart() {
+      localStorage.setItem('wandyt_cart', JSON.stringify(cart));
+    }
+
+    function updateCartUI() {
+      const container = document.getElementById('cart-items-container');
+      const countEl = document.getElementById('cart-count');
+      const totalEl = document.getElementById('cart-total-val');
+      
+      container.innerHTML = '';
+      let total = 0;
+      let count = 0;
+      
+      cart.forEach((item, index) => {
+        total += item.price * item.qty;
+        count += item.qty;
+        
+        container.innerHTML += `
+          <div class="cart-item">
+            <div class="cart-item-img">📦</div>
+            <div class="cart-item-info">
+              <div class="cart-item-title">${item.name} <span style="color:var(--text-muted)">x${item.qty}</span></div>
+              <div class="cart-item-price">${item.price * item.qty} EME</div>
+            </div>
+            <button class="remove-item" onclick="removeFromCart(${index})">🗑️</button>
+          </div>
+        `;
+      });
+      
+      if (cart.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted); text-align: center; margin-top: 2rem;">Your Ender Chest is empty.</p>';
+      }
+      
+      countEl.textContent = count;
+      totalEl.textContent = total;
+    }
+
+    function toggleCart() {
+      document.getElementById('side-cart').classList.toggle('active');
+      document.getElementById('cart-overlay').classList.toggle('active');
+    }
+
+    function showToast(message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = message;
+      
+      container.appendChild(toast);
       
       setTimeout(() => {
-        button.textContent = originalText;
-        button.style.backgroundColor = "var(--card-bg)";
-        button.style.color = "var(--accent-emerald)";
-      }, 1000);
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        toast.style.transition = 'all 0.3s';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    function openQuickView(id) {
+      // Find card data
+      const card = document.querySelector(`.tilt-card[data-id="${id}"]`);
+      if(!card) return;
+      
+      const title = card.querySelector('.item-title').textContent;
+      const desc = card.querySelector('.item-desc').textContent;
+      const price = card.querySelector('.price-val').textContent;
+      const imgHtml = card.querySelector('.item-image').outerHTML;
+      const badges = card.querySelector('.card-badges').innerHTML;
+      
+      document.getElementById('qv-title').textContent = title;
+      document.getElementById('qv-desc').textContent = desc;
+      document.getElementById('qv-price').textContent = price;
+      
+      const loreBtn = document.getElementById('generate-lore-btn');
+      if (loreBtn) {
+        loreBtn.style.display = 'inline-flex';
+        loreBtn.disabled = false;
+        loreBtn.innerHTML = '✨ Translate Ancient Lore (AI)';
+      }
+      
+      const imgContainer = document.querySelector('.modal-image');
+      imgContainer.innerHTML = imgHtml;
+      // ensure image is visible in modal
+      imgContainer.querySelector('.item-image').style.opacity = '1'; 
+      imgContainer.querySelector('.item-image').style.width = '150px'; 
+      imgContainer.querySelector('.item-image').style.height = '150px'; 
+      
+      document.getElementById('qv-badges').innerHTML = badges;
+      
+      document.getElementById('quick-view-overlay').classList.add('active');
+    }
+
+    function closeQuickView(event, force = false) {
+      if (force || event.target.id === 'quick-view-overlay') {
+        document.getElementById('quick-view-overlay').classList.remove('active');
+      }
+    }
+
+    // --- Gemini API Features ---
+    const GEMINI_API_KEY = ""; // Intentionally blank, injected securely by runtime
+    const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${GEMINI_API_KEY}`;
+    
+    let chatHistory = [];
+    const clericsSystemPrompt = "You are an ancient, wise Minecraft Village Cleric working at WandyT Armory. You sell enchanted diamond/netherite gear and forbidden arcana. Help customers pick gear for their adventures (e.g. fighting the Wither, Warden, or exploring). Keep responses short (1 to 2 sentences max), highly thematic, and use Minecraft terminology (mobs, durability, emeralds). Never break character.";
+
+    // Exponential backoff helper for API calls
+    async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
+      for (let i = 0; i < retries; i++) {
+        try {
+          const response = await fetch(url, options);
+          if (!response.ok && response.status === 429) throw new Error('Rate limited');
+          return response;
+        } catch (error) {
+          if (i === retries - 1) throw error;
+          await new Promise(res => setTimeout(res, delay * Math.pow(2, i)));
+        }
+      }
+    }
+
+    function toggleAIChat() {
+      document.getElementById('ai-chat-window').classList.toggle('active');
+    }
+
+    async function sendChatMessage() {
+      const inputEl = document.getElementById('chat-input-field');
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      appendMessage(text, 'user');
+      inputEl.value = '';
+      
+      const typingId = appendMessage('Consulting the ancients...', 'ai');
+
+      // Construct conversational payload
+      const contents = chatHistory.map(msg => ({
+        role: msg.role === 'ai' ? 'model' : 'user',
+        parts: [{ text: msg.text }]
+      }));
+      contents.push({ role: 'user', parts: [{ text: text }] });
+
+      const payload = {
+        contents: contents,
+        systemInstruction: { parts: [{ text: clericsSystemPrompt }] }
+      };
+
+      try {
+        const response = await fetchWithBackoff(GEMINI_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        
+        if (result.candidates && result.candidates[0].content) {
+          const aiText = result.candidates[0].content.parts[0].text;
+          updateMessage(typingId, aiText);
+          chatHistory.push({ role: 'user', text: text });
+          chatHistory.push({ role: 'ai', text: aiText });
+        } else {
+          updateMessage(typingId, "The arcane connection was lost in the nether. Try again.");
+        }
+      } catch (e) {
+        updateMessage(typingId, "The sculk sensors are jamming my signal. (API Error)");
+      }
+    }
+
+    function appendMessage(text, sender) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `msg ${sender}`;
+      msgDiv.id = 'msg-' + Date.now();
+      msgDiv.textContent = text;
+      
+      const container = document.getElementById('chat-messages');
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
+      return msgDiv.id;
+    }
+
+    function updateMessage(id, text) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = text;
+        const container = document.getElementById('chat-messages');
+        container.scrollTop = container.scrollHeight; // Auto-scroll on update
+      }
+    }
+
+    async function generateLore() {
+      const title = document.getElementById('qv-title').textContent;
+      const descEl = document.getElementById('qv-desc');
+      const btn = document.getElementById('generate-lore-btn');
+      
+      const prompt = `Write a short, epic, and mysterious 2-sentence Minecraft lore for an item named "${title}". Make it sound like an ancient relic found in an Ancient City, Bastion Remnant, or Stronghold.`;
+      
+      btn.disabled = true;
+      btn.innerHTML = '✨ Unearthing Secrets...';
+
+      const payload = {
+        contents: [{ parts: [{ text: prompt }] }],
+        systemInstruction: { parts: [{ text: "You are a master Minecraft loremaster writing high-fantasy item descriptions." }] }
+      };
+
+      try {
+        const response = await fetchWithBackoff(GEMINI_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        
+        if (result.candidates && result.candidates[0].content) {
+          const loreText = result.candidates[0].content.parts[0].text;
+          // Prepend the AI lore to the existing mechanical description
+          const currentDesc = descEl.getAttribute('data-original') || descEl.textContent;
+          descEl.setAttribute('data-original', currentDesc);
+          
+          descEl.innerHTML = `<span style="color: var(--accent-netherite); font-style: italic;">"${loreText}"</span><br><br><span style="font-size: 0.9em; opacity: 0.8;">Stats: ${currentDesc}</span>`;
+          btn.style.display = 'none';
+        } else {
+          throw new Error("No candidates");
+        }
+      } catch (e) {
+        btn.innerHTML = '✨ Magic Failed. Try again.';
+        btn.disabled = false;
+      }
     }
   </script>
 </body>
