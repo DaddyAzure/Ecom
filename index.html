@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WandyT Company | Minecraft Armory & Arcana</title>
+  <title>WandyT Inc. | Minecraft Armory & Arcana</title>
   <style>
     :root {
-      --bg-dark: #0f1015;
-      --panel-bg: #181a20;
+      --bg-dark: #090a0d;
+      --panel-bg: rgba(24, 26, 32, 0.94);
       --card-bg: #21242d;
       --accent-emerald: #00d166;
       --accent-emerald-hover: #00b355;
@@ -26,7 +26,27 @@
       cursor: none !important;
     }
 
-    /* Custom Minecraft Crosshair Cursor */
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.6;
+      position: relative;
+      min-height: 100vh;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    #cobble-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
     #minecraft-cursor {
       position: fixed;
       top: 0;
@@ -60,15 +80,27 @@
       height: 12px;
     }
 
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      line-height: 1.6;
+    .cost-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      line-height: 1;
+      vertical-align: middle;
     }
 
-    /* Top Navigation */
+    .emerald-icon {
+      width: auto;
+      height: 1em;
+      max-height: 22px;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      object-fit: contain;
+      display: block;
+    }
+
     header {
       background-color: var(--panel-bg);
+      backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--border-color);
       position: sticky;
       top: 0;
@@ -117,9 +149,241 @@
       color: var(--accent-emerald);
       font-weight: 600;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: border-color 0.2s;
     }
 
-    /* Tab Pane Container */
+    .cart-btn:hover {
+      border-color: var(--accent-emerald);
+    }
+
+    /* Cart Drawer */
+    #cart-drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    #cart-drawer-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #cart-drawer {
+      position: fixed;
+      top: 0;
+      right: -420px;
+      width: 400px;
+      max-width: 90vw;
+      height: 100vh;
+      background-color: #16181f;
+      border-left: 2px solid var(--border-color);
+      z-index: 201;
+      display: flex;
+      flex-direction: column;
+      box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+      transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #cart-drawer.open {
+      right: 0;
+    }
+
+    .drawer-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .drawer-header h3 {
+      font-size: 1.3rem;
+      color: var(--accent-emerald);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .close-drawer-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .close-drawer-btn:hover {
+      color: var(--text-main);
+    }
+
+    .cart-items-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .empty-cart-msg {
+      text-align: center;
+      color: var(--text-muted);
+      margin-top: 3rem;
+      font-size: 0.95rem;
+    }
+
+    .cart-item-row {
+      display: grid;
+      grid-template-columns: 50px 1fr auto;
+      gap: 0.8rem;
+      align-items: center;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.6rem;
+    }
+
+    .cart-item-img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      background-color: #131418;
+      border-radius: 4px;
+      padding: 4px;
+    }
+
+    .cart-item-info h4 {
+      font-size: 0.9rem;
+      line-height: 1.2;
+    }
+
+    .cart-item-tier {
+      font-size: 0.75rem;
+      color: var(--accent-diamond);
+    }
+
+    .cart-item-tier.netherite {
+      color: var(--accent-netherite);
+    }
+
+    .cart-item-price {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-emerald);
+      display: flex;
+      align-items: center;
+      margin-top: 2px;
+    }
+
+    .cart-qty-ctrls {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .qty-btn {
+      background: #111317;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qty-btn:hover {
+      border-color: var(--accent-emerald);
+      color: var(--accent-emerald);
+    }
+
+    .qty-display {
+      font-weight: 700;
+      font-size: 0.85rem;
+      min-width: 16px;
+      text-align: center;
+    }
+
+    .remove-item-btn {
+      background: none;
+      border: none;
+      color: #ff5252;
+      font-size: 0.8rem;
+      cursor: pointer;
+      margin-left: 0.2rem;
+    }
+
+    .drawer-footer {
+      padding: 1.5rem;
+      border-top: 1px solid var(--border-color);
+      background-color: #121318;
+    }
+
+    .drawer-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .drawer-total span:last-child {
+      color: var(--accent-emerald);
+      display: flex;
+      align-items: center;
+    }
+
+    .checkout-btn {
+      width: 100%;
+      background-color: var(--accent-emerald);
+      color: #05140b;
+      padding: 0.8rem;
+      border-radius: 6px;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+
+    .checkout-btn:hover {
+      background-color: var(--accent-emerald-hover);
+    }
+
+    .clear-cart-link {
+      display: block;
+      text-align: center;
+      margin-top: 0.8rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      width: 100%;
+    }
+
+    .clear-cart-link:hover {
+      color: #ff5252;
+    }
+
     .page-section {
       display: none;
     }
@@ -127,18 +391,18 @@
       display: block;
     }
 
-    /* Hero Section */
     .hero {
       max-width: 1200px;
       margin: 2rem auto;
       padding: 3rem 2rem;
-      background: linear-gradient(135deg, #1b1e27 0%, #111318 100%);
+      background: linear-gradient(135deg, rgba(27, 30, 39, 0.95) 0%, rgba(17, 19, 24, 0.95) 100%);
       border-radius: 12px;
       border: 1px solid var(--border-color);
       display: grid;
       grid-template-columns: 1.2fr 0.8fr;
       gap: 2rem;
       align-items: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
 
     .hero-content h1 {
@@ -155,6 +419,15 @@
       color: var(--text-muted);
       margin-bottom: 1.5rem;
       font-size: 1.1rem;
+    }
+
+    .hero-image {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background-color: var(--card-bg);
     }
 
     .cta-btn {
@@ -174,7 +447,6 @@
       background-color: var(--accent-emerald-hover);
     }
 
-    /* Trust Banner */
     .trust-banner {
       background-color: var(--panel-bg);
       border-top: 1px solid var(--border-color);
@@ -203,11 +475,11 @@
       margin-right: 0.4rem;
     }
 
-    /* General Container & Category Grid */
     .container {
       max-width: 1200px;
       margin: 3rem auto;
       padding: 0 2rem;
+      position: relative;
     }
 
     .section-title {
@@ -215,6 +487,7 @@
       margin-bottom: 1.5rem;
       border-left: 4px solid var(--accent-emerald);
       padding-left: 0.75rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
     }
 
     .category-grid {
@@ -232,6 +505,7 @@
       text-align: center;
       cursor: pointer;
       transition: transform 0.2s ease, border-color 0.2s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
 
     .category-card:hover {
@@ -239,12 +513,14 @@
       border-color: var(--accent-diamond);
     }
 
-    /* Tab Controls */
     .tabs-nav {
       display: flex;
       gap: 1rem;
       border-bottom: 1px solid var(--border-color);
       margin-bottom: 2rem;
+      background-color: var(--panel-bg);
+      border-radius: 8px 8px 0 0;
+      padding: 0.5rem 1rem 0;
     }
 
     .tab-btn {
@@ -286,7 +562,6 @@
       display: block;
     }
 
-    /* Product Cards */
     .product-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -302,23 +577,25 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
 
-    .image-placeholder {
+    .product-image {
       width: 100%;
       height: 180px;
+      object-fit: contain;
       background-color: var(--card-bg);
-      border: 2px dashed var(--border-color);
+      border: 1px solid var(--border-color);
       border-radius: 6px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-muted);
-      font-size: 0.85rem;
+      padding: 1.5rem;
       margin-bottom: 1rem;
-      text-align: center;
-      padding: 0.5rem;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      transition: transform 0.2s ease;
+    }
+
+    .product-card:hover .product-image {
+      transform: scale(1.05);
     }
 
     .badge {
@@ -328,6 +605,7 @@
       font-size: 0.75rem;
       font-weight: 700;
       margin-bottom: 0.5rem;
+      width: fit-content;
     }
 
     .badge-diamond {
@@ -341,21 +619,26 @@
     }
 
     .price-tag {
-      font-size: 1.15rem;
+      font-size: 1.25rem;
       font-weight: 700;
       color: var(--accent-emerald);
       margin: 0.8rem 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1;
     }
 
     .upgrade-toggle {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.45rem;
       margin: 0.5rem 0;
       font-size: 0.85rem;
       color: var(--accent-netherite);
       font-weight: 600;
       cursor: pointer;
+      line-height: 1;
     }
 
     .add-to-cart-btn {
@@ -375,7 +658,6 @@
       color: #05140b;
     }
 
-    /* Sale banner for books */
     .sale-banner {
       background: rgba(223, 128, 255, 0.1);
       border: 1px solid var(--accent-netherite);
@@ -385,9 +667,9 @@
       text-align: center;
       color: var(--accent-netherite);
       font-weight: 600;
+      background-color: var(--panel-bg);
     }
 
-    /* Story Section Styles */
     .story-content {
       background-color: var(--panel-bg);
       border: 1px solid var(--border-color);
@@ -395,6 +677,7 @@
       padding: 3rem;
       max-width: 900px;
       margin: 0 auto;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
     }
 
     .story-content h2 {
@@ -410,13 +693,154 @@
       line-height: 1.8;
     }
 
-    /* Footer */
+    /* Checkout & Delivery Protocol */
+    .form-card {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2.5rem;
+      max-width: 650px;
+      margin: 0 auto;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text-main);
+      font-size: 0.95rem;
+    }
+
+    .form-control {
+      width: 100%;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.8rem 1rem;
+      color: var(--text-main);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+      border-color: var(--accent-emerald);
+    }
+
+    .coord-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .order-summary-box {
+      background-color: #121318;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Success Page Animations & Effects */
+    .success-card {
+      background-color: var(--panel-bg);
+      border: 2px solid var(--accent-emerald);
+      border-radius: 12px;
+      padding: 3rem;
+      max-width: 650px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+      overflow: visible;
+      box-shadow: 0 10px 40px rgba(0, 209, 102, 0.25);
+    }
+
+    #particle-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Animated Ender Chest WebP */
+    .ender-chest-graphic {
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 1.5rem;
+      display: block;
+      object-fit: contain;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      filter: drop-shadow(0 0 16px rgba(77, 238, 234, 0.7)) drop-shadow(0 0 25px rgba(168, 85, 247, 0.8));
+      animation: chestFloat 2.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes chestFloat {
+      0% {
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        transform: translateY(-8px) scale(1.05);
+      }
+    }
+
+    /* Receipt Box & Repositioned Cleric Stamp */
+    .receipt-box {
+      background-color: #121318;
+      border: 2px solid #232733;
+      border-radius: 8px;
+      padding: 2.2rem 1.8rem 1.5rem;
+      text-align: left;
+      margin: 2.2rem 0;
+      font-family: monospace;
+      position: relative;
+    }
+
+    .cleric-stamp {
+      position: absolute;
+      right: 14px;
+      top: -18px;
+      border: 2px dashed var(--accent-emerald);
+      color: var(--accent-emerald);
+      background-color: #121318;
+      padding: 0.35rem 0.75rem;
+      font-weight: 900;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transform: rotate(-8deg);
+      opacity: 0.95;
+      box-shadow: 0 0 15px rgba(0, 209, 102, 0.3);
+      animation: stampDrop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      z-index: 5;
+    }
+
+    @keyframes stampDrop {
+      0% { transform: scale(2.5) rotate(-28deg); opacity: 0; }
+      100% { transform: scale(1) rotate(-8deg); opacity: 0.95; }
+    }
+
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.6rem;
+    }
+
     footer {
       background-color: var(--panel-bg);
       border-top: 1px solid var(--border-color);
       padding: 3rem 2rem;
       color: var(--text-muted);
       font-size: 0.9rem;
+      margin-top: 4rem;
     }
 
     .footer-grid {
@@ -447,45 +871,78 @@
       .category-grid {
         grid-template-columns: 1fr;
       }
+      #cart-drawer {
+        width: 100vw;
+      }
+      .coord-grid {
+        grid-template-columns: 1fr;
+      }
+      .cleric-stamp {
+        position: static;
+        margin-bottom: 1rem;
+        display: inline-block;
+        transform: rotate(0deg);
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Custom Minecraft Crosshair Cursor -->
+  <canvas id="cobble-canvas"></canvas>
   <div id="minecraft-cursor"></div>
+
+  <!-- Cart Drawer -->
+  <div id="cart-drawer-overlay" onclick="toggleCartDrawer(false)"></div>
+  <aside id="cart-drawer">
+    <div class="drawer-header">
+      <h3>📦 Ender Chest Inventory</h3>
+      <button class="close-drawer-btn" onclick="toggleCartDrawer(false)">✕</button>
+    </div>
+    
+    <div class="cart-items-container" id="cart-items-list">
+      <div class="empty-cart-msg">Your Ender Chest is empty.<br>Select armaments to load storage.</div>
+    </div>
+
+    <div class="drawer-footer">
+      <div class="drawer-total">
+        <span>Subtotal:</span>
+        <span class="cost-badge">
+          <span id="cart-subtotal-val">0</span><img class="emerald-icon" src="images/emerald.png" alt="EME">
+        </span>
+      </div>
+      <button class="checkout-btn" onclick="proceedToDelivery()">Proceed to Dimension Delivery</button>
+      <button class="clear-cart-link" onclick="clearCart()">Clear All Armaments</button>
+    </div>
+  </aside>
 
   <!-- Top Navigation -->
   <header>
     <div class="nav-container">
-      <div class="logo">WandyT Company</div>
+      <div class="logo">WandyT Inc.</div>
       <ul class="nav-links">
         <li><a id="nav-home" class="active" onclick="switchPage('home')">Home</a></li>
         <li><a id="nav-armory" onclick="switchPage('armory')">Armory</a></li>
         <li><a id="nav-story" onclick="switchPage('story')">Our Story</a></li>
       </ul>
-      <button class="cart-btn" id="cart-counter">🛒 Cart (0 EME)</button>
+      <button class="cart-btn" id="cart-counter" onclick="toggleCartDrawer(true)">
+        🛒 Cart (<span id="cart-counter-qty">0</span>)
+      </button>
     </div>
   </header>
 
   <!-- HOME PAGE -->
   <div id="page-home" class="page-section active">
-    <!-- Hero Section -->
     <section class="hero">
       <div class="hero-content">
         <h1>Forged for the Deep Dark, <span>Enchanted for Eternity</span></h1>
-        <p>Equip yourself with Diamond and Netherite-grade equipment from WandyT Company. Certified curse-free by the Village Cleric Guild.</p>
+        <p>Equip yourself with Diamond and Netherite-grade equipment from WandyT Inc. Certified curse-free by the Village Cleric Guild.</p>
         <button class="cta-btn" onclick="switchPage('armory'); switchTab('tools-tab');">
           Browse the Anvil Armory
         </button>
       </div>
-      <div class="image-placeholder">
-        <strong>[ PASTE HERO BANNER / FORGE ARTWORK HERE ]</strong>
-        <span>Recommended: 600x350px PNG</span>
-      </div>
+      <img class="hero-image" src="images/hero_banner.png" alt="WandyT Inc. Forge Banner" onerror="this.style.display='none'" />
     </section>
 
-    <!-- Trust Banner -->
     <div class="trust-banner">
       <div class="trust-grid">
         <div class="trust-item"><span>🛡️</span> 100% Curse-Free Guarantee</div>
@@ -519,7 +976,6 @@
     <main class="container">
       <h2 class="section-title">Armory Catalog</h2>
 
-      <!-- Tab Selector -->
       <div class="tabs-nav">
         <button class="tab-btn active" id="btn-tools-tab" onclick="switchTab('tools-tab')">Tools</button>
         <button class="tab-btn" id="btn-armor-tab" onclick="switchTab('armor-tab')">Armour</button>
@@ -530,44 +986,68 @@
       <div class="tab-pane active" id="tools-tab">
         <div class="product-grid">
           <!-- Pickaxe -->
-          <div class="product-card" data-base-price="32" data-upgrade-cost="24">
-            <div class="image-placeholder"><strong>[ PICKAXE IMAGE ]</strong></div>
+          <div class="product-card" 
+               data-id="tool-pickaxe"
+               data-name="Excavator Pickaxe"
+               data-base-price="32" 
+               data-upgrade-cost="24"
+               data-diamond-img="images/diamond_pickaxe.png"
+               data-netherite-img="images/netherite_pickaxe.png">
+            <img class="product-image" src="images/diamond_pickaxe.png" alt="Excavator Pickaxe" />
             <span class="badge badge-diamond item-badge">Diamond Tier</span>
             <h3 class="item-title">Excavator Pickaxe</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Efficiency V, Unbreaking III</p>
             <label class="upgrade-toggle">
               <input type="checkbox" onchange="toggleNetherite(this)" />
-              Upgrade to Netherite (+24 EME)
+              Upgrade to Netherite +<span class="cost-badge">24<img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </label>
-            <div class="price-tag">Price: <span class="current-price">32</span> Emeralds</div>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">32</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
             <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
           </div>
 
           <!-- Axe -->
-          <div class="product-card" data-base-price="28" data-upgrade-cost="24">
-            <div class="image-placeholder"><strong>[ AXE IMAGE ]</strong></div>
+          <div class="product-card" 
+               data-id="tool-axe"
+               data-name="Timber & Cleave Axe"
+               data-base-price="28" 
+               data-upgrade-cost="24"
+               data-diamond-img="images/diamond_axe.png"
+               data-netherite-img="images/netherite_axe.png">
+            <img class="product-image" src="images/diamond_axe.png" alt="Timber & Cleave Axe" />
             <span class="badge badge-diamond item-badge">Diamond Tier</span>
             <h3 class="item-title">Timber & Cleave Axe</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Sharpness V, Efficiency IV</p>
             <label class="upgrade-toggle">
               <input type="checkbox" onchange="toggleNetherite(this)" />
-              Upgrade to Netherite (+24 EME)
+              Upgrade to Netherite +<span class="cost-badge">24<img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </label>
-            <div class="price-tag">Price: <span class="current-price">28</span> Emeralds</div>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">28</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
             <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
           </div>
 
           <!-- Shovel -->
-          <div class="product-card" data-base-price="16" data-upgrade-cost="20">
-            <div class="image-placeholder"><strong>[ SHOVEL IMAGE ]</strong></div>
+          <div class="product-card" 
+               data-id="tool-shovel"
+               data-name="Dune Trench Shovel"
+               data-base-price="16" 
+               data-upgrade-cost="20"
+               data-diamond-img="images/diamond_shovel.png"
+               data-netherite-img="images/netherite_shovel.png">
+            <img class="product-image" src="images/diamond_shovel.png" alt="Dune Trench Shovel" />
             <span class="badge badge-diamond item-badge">Diamond Tier</span>
             <h3 class="item-title">Dune Trench Shovel</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Silk Touch I, Unbreaking III</p>
             <label class="upgrade-toggle">
               <input type="checkbox" onchange="toggleNetherite(this)" />
-              Upgrade to Netherite (+20 EME)
+              Upgrade to Netherite +<span class="cost-badge">20<img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </label>
-            <div class="price-tag">Price: <span class="current-price">16</span> Emeralds</div>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">16</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
             <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
           </div>
         </div>
@@ -577,58 +1057,90 @@
       <div class="tab-pane" id="armor-tab">
         <div class="product-grid">
           <!-- Helmet -->
-          <div class="product-card" data-base-price="24" data-upgrade-cost="28">
-            <div class="image-placeholder"><strong>[ HELMET IMAGE ]</strong></div>
+          <div class="product-card" 
+               data-id="armor-helmet"
+               data-name="Crown of the Abyss"
+               data-base-price="24" 
+               data-upgrade-cost="28"
+               data-diamond-img="images/diamond_helmet.png"
+               data-netherite-img="images/netherite_helmet.png">
+            <img class="product-image" src="images/diamond_helmet.png" alt="Crown of the Abyss" />
             <span class="badge badge-diamond item-badge">Diamond Tier</span>
             <h3 class="item-title">Crown of the Abyss</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Respiration III, Aqua Affinity</p>
             <label class="upgrade-toggle">
               <input type="checkbox" onchange="toggleNetherite(this)" />
-              Upgrade to Netherite (+28 EME)
+              Upgrade to Netherite +<span class="cost-badge">28<img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </label>
-            <div class="price-tag">Price: <span class="current-price">24</span> Emeralds</div>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">24</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
             <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
           </div>
 
           <!-- Chestplate -->
-          <div class="product-card" data-base-price="40" data-upgrade-cost="32">
-            <div class="image-placeholder"><strong>[ CHESTPLATE IMAGE ]</strong></div>
+          <div class="product-card" 
+               data-id="armor-chest"
+               data-name="Bastion Bulwark"
+               data-base-price="40" 
+               data-upgrade-cost="32"
+               data-diamond-img="images/diamond_chestplate.png"
+               data-netherite-img="images/netherite_chestplate.png">
+            <img class="product-image" src="images/diamond_chestplate.png" alt="Bastion Bulwark" />
             <span class="badge badge-diamond item-badge">Diamond Tier</span>
             <h3 class="item-title">Bastion Bulwark</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Protection IV, Unbreaking III</p>
             <label class="upgrade-toggle">
               <input type="checkbox" onchange="toggleNetherite(this)" />
-              Upgrade to Netherite (+32 EME)
+              Upgrade to Netherite +<span class="cost-badge">32<img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </label>
-            <div class="price-tag">Price: <span class="current-price">40</span> Emeralds</div>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">40</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
             <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
           </div>
 
           <!-- Leggings -->
-          <div class="product-card" data-base-price="34" data-upgrade-cost="30">
-            <div class="image-placeholder"><strong>[ LEGGINGS IMAGE ]</strong></div>
+          <div class="product-card" 
+               data-id="armor-legs"
+               data-name="Stride Greaves"
+               data-base-price="34" 
+               data-upgrade-cost="30"
+               data-diamond-img="images/diamond_leggings.png"
+               data-netherite-img="images/netherite_leggings.png">
+            <img class="product-image" src="images/diamond_leggings.png" alt="Stride Greaves" />
             <span class="badge badge-diamond item-badge">Diamond Tier</span>
             <h3 class="item-title">Stride Greaves</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Swift Sneak III, Protection IV</p>
             <label class="upgrade-toggle">
               <input type="checkbox" onchange="toggleNetherite(this)" />
-              Upgrade to Netherite (+30 EME)
+              Upgrade to Netherite +<span class="cost-badge">30<img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </label>
-            <div class="price-tag">Price: <span class="current-price">34</span> Emeralds</div>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">34</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
             <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
           </div>
 
           <!-- Boots -->
-          <div class="product-card" data-base-price="20" data-upgrade-cost="28">
-            <div class="image-placeholder"><strong>[ BOOTS IMAGE ]</strong></div>
+          <div class="product-card" 
+               data-id="armor-boots"
+               data-name="Cloudwalkers"
+               data-base-price="20" 
+               data-upgrade-cost="28"
+               data-diamond-img="images/diamond_boots.png"
+               data-netherite-img="images/netherite_boots.png">
+            <img class="product-image" src="images/diamond_boots.png" alt="Cloudwalkers" />
             <span class="badge badge-diamond item-badge">Diamond Tier</span>
             <h3 class="item-title">Cloudwalkers</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Enchantment: Feather Falling IV, Soul Speed III</p>
             <label class="upgrade-toggle">
               <input type="checkbox" onchange="toggleNetherite(this)" />
-              Upgrade to Netherite (+28 EME)
+              Upgrade to Netherite +<span class="cost-badge">28<img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </label>
-            <div class="price-tag">Price: <span class="current-price">20</span> Emeralds</div>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">20</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
             <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
           </div>
         </div>
@@ -640,103 +1152,113 @@
           📜 Books are on sale randomly. So check everyday for the book you want!
         </div>
         <div class="product-grid">
-          <!-- Mending -->
-          <div class="product-card" data-base-price="48">
-            <div class="image-placeholder"><strong>[ BOOK IMAGE ]</strong></div>
+          <div class="product-card" data-id="book-mending" data-name="Tome of Mending" data-base-price="48">
+            <img class="product-image" src="images/enchanted_book.png" alt="Tome of Mending" />
             <span class="badge badge-book">Forbidden Arcana</span>
             <h3 class="item-title">Tome of Mending</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Restores item durability using gathered experience orbs.</p>
-            <div class="price-tag">Price: <span class="current-price">48</span> Emeralds</div>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">48</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
             <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
           </div>
 
-          <!-- Fortune III -->
-          <div class="product-card" data-base-price="36">
-            <div class="image-placeholder"><strong>[ BOOK IMAGE ]</strong></div>
+          <div class="product-card" data-id="book-fortune" data-name="Tome of Fortune III" data-base-price="36">
+            <img class="product-image" src="images/enchanted_book.png" alt="Tome of Fortune III" />
             <span class="badge badge-book">Resource Arcana</span>
             <h3 class="item-title">Tome of Fortune III</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Multiplies raw drop yields from diamond, gold, and coal ores.</p>
-            <div class="price-tag">Price: <span class="current-price">36</span> Emeralds</div>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">36</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
             <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
           </div>
 
-          <!-- Silk Touch -->
-          <div class="product-card" data-base-price="32">
-            <div class="image-placeholder"><strong>[ BOOK IMAGE ]</strong></div>
+          <div class="product-card" data-id="book-silktouch" data-name="Tome of Silk Touch" data-base-price="32">
+            <img class="product-image" src="images/enchanted_book.png" alt="Tome of Silk Touch" />
             <span class="badge badge-book">Excavation Arcana</span>
             <h3 class="item-title">Tome of Silk Touch</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Mines fragile blocks intact (ice, glass, campfires, and ores).</p>
-            <div class="price-tag">Price: <span class="current-price">32</span> Emeralds</div>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">32</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
             <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
           </div>
 
-          <!-- Looting III -->
-          <div class="product-card" data-base-price="42">
-            <div class="image-placeholder"><strong>[ BOOK IMAGE ]</strong></div>
+          <div class="product-card" data-id="book-looting" data-name="Tome of Looting III" data-base-price="42">
+            <img class="product-image" src="images/enchanted_book.png" alt="Tome of Looting III" />
             <span class="badge badge-book">Combat Arcana</span>
             <h3 class="item-title">Tome of Looting III</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Increases mob loot quantity and rare drop probabilities.</p>
-            <div class="price-tag">Price: <span class="current-price">42</span> Emeralds</div>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">42</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
             <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
           </div>
 
-          <!-- Feather Falling IV -->
-          <div class="product-card" data-base-price="28">
-            <div class="image-placeholder"><strong>[ BOOK IMAGE ]</strong></div>
+          <div class="product-card" data-id="book-featherfall" data-name="Tome of Feather Falling IV" data-base-price="28">
+            <img class="product-image" src="images/enchanted_book.png" alt="Tome of Feather Falling IV" />
             <span class="badge badge-book">Survival Arcana</span>
             <h3 class="item-title">Tome of Feather Falling IV</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Reduces vertical fall damage and pearl teleportation impacts.</p>
-            <div class="price-tag">Price: <span class="current-price">28</span> Emeralds</div>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">28</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
             <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
           </div>
 
-          <!-- Infinity -->
-          <div class="product-card" data-base-price="30">
-            <div class="image-placeholder"><strong>[ BOOK IMAGE ]</strong></div>
+          <div class="product-card" data-id="book-infinity" data-name="Tome of Infinity" data-base-price="30">
+            <img class="product-image" src="images/enchanted_book.png" alt="Tome of Infinity" />
             <span class="badge badge-book">Archery Arcana</span>
             <h3 class="item-title">Tome of Infinity</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Fires unlimited arrows without depleting quiver inventory.</p>
-            <div class="price-tag">Price: <span class="current-price">30</span> Emeralds</div>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">30</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
             <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
           </div>
 
-          <!-- Sharpness V -->
-          <div class="product-card" data-base-price="38">
-            <div class="image-placeholder"><strong>[ BOOK IMAGE ]</strong></div>
+          <div class="product-card" data-id="book-sharpness" data-name="Tome of Sharpness V" data-base-price="38">
+            <img class="product-image" src="images/enchanted_book.png" alt="Tome of Sharpness V" />
             <span class="badge badge-book">Combat Arcana</span>
             <h3 class="item-title">Tome of Sharpness V</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Imbues melee weapons with maximum physical cutting damage.</p>
-            <div class="price-tag">Price: <span class="current-price">38</span> Emeralds</div>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">38</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
             <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
           </div>
 
-          <!-- Swift Sneak III -->
-          <div class="product-card" data-base-price="45">
-            <div class="image-placeholder"><strong>[ BOOK IMAGE ]</strong></div>
+          <div class="product-card" data-id="book-swiftsneak" data-name="Tome of Swift Sneak III" data-base-price="45">
+            <img class="product-image" src="images/enchanted_book.png" alt="Tome of Swift Sneak III" />
             <span class="badge badge-book">Ancient City Relic</span>
             <h3 class="item-title">Tome of Swift Sneak III</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Walk at full operational speed while remaining completely crouched.</p>
-            <div class="price-tag">Price: <span class="current-price">45</span> Emeralds</div>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">45</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
             <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
           </div>
 
-          <!-- New Book Option 1: Fire Aspect II -->
-          <div class="product-card" data-base-price="34">
-            <div class="image-placeholder"><strong>[ BOOK IMAGE ]</strong></div>
+          <div class="product-card" data-id="book-fireaspect" data-name="Tome of Fire Aspect II" data-base-price="34">
+            <img class="product-image" src="images/enchanted_book.png" alt="Tome of Fire Aspect II" />
             <span class="badge badge-book">Combat Arcana</span>
             <h3 class="item-title">Tome of Fire Aspect II</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Sets targets ablaze upon melee contact, searing adversaries.</p>
-            <div class="price-tag">Price: <span class="current-price">34</span> Emeralds</div>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">34</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
             <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
           </div>
 
-          <!-- New Book Option 2: Efficiency V -->
-          <div class="product-card" data-base-price="40">
-            <div class="image-placeholder"><strong>[ BOOK IMAGE ]</strong></div>
+          <div class="product-card" data-id="book-efficiency" data-name="Tome of Efficiency V" data-base-price="40">
+            <img class="product-image" src="images/enchanted_book.png" alt="Tome of Efficiency V" />
             <span class="badge badge-book">Excavation Arcana</span>
             <h3 class="item-title">Tome of Efficiency V</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Blazes through stone and wood at maximum mining speeds.</p>
-            <div class="price-tag">Price: <span class="current-price">40</span> Emeralds</div>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">40</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
             <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
           </div>
         </div>
@@ -748,10 +1270,84 @@
   <div id="page-story" class="page-section">
     <main class="container">
       <div class="story-content">
-        <h2>The Legend of WandyT Company</h2>
-        <p>Founded deep within the subterranean caverns of the Overworld, WandyT Company began as a modest forge operated by master villagers dedicated to crafting curse-free armaments for brave explorers facing the endless night.</p>
-        <p>When the Nether portals opened and the Warden awoke in the Ancient Cities, standard gear simply wasn't enough. Our smiths partnered with master librarians to forge diamond plates infused with ancient arcana, later upgradeable to pure Netherite plating capable of withstanding extreme subterranean heat and boss raids.</p>
-        <p>Today, WandyT Company utilizes advanced Ender Chest Sync protocols to deliver top-tier tools and enchanted tomes directly to travelers across every dimension, backed by our ironclad Village Cleric Guild guarantee.</p>
+        <h2>The Legend of WandyT</h2>
+        <p>Founded deep within the subterranean caverns of the Overworld, WandyT Inc. began as a modest forge operated by master villagers dedicated to crafting curse-free armaments for brave explorers facing the endless night.</p>
+        <p>When the Nether portals opened and the Warden awoke in the Ancient Cities, standard gear practicalities faded. Our smiths partnered with master librarians to forge diamond plates infused with ancient arcana, later upgradeable to pure Netherite plating capable of withstanding extreme subterranean heat and boss raids.</p>
+        <p>Today, WandyT Inc. utilizes advanced Ender Chest Sync protocols to deliver top-tier tools and enchanted tomes directly to travelers across every dimension, backed by our ironclad Village Cleric Guild guarantee.</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- DELIVERY PROTOCOL PAGE -->
+  <div id="page-delivery" class="page-section">
+    <main class="container">
+      <div class="form-card">
+        <h2 class="section-title">Ender Chest Delivery Protocol</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.95rem;">Enter your dimension coordinates and player credentials to calibrate Allay express routing.</p>
+        
+        <div class="order-summary-box">
+          <div style="font-weight: 700; margin-bottom: 0.5rem; color: var(--accent-emerald);">Order Summary:</div>
+          <div id="delivery-items-preview" style="font-size: 0.9rem; color: var(--text-muted);"></div>
+          <div style="margin-top: 0.8rem; font-weight: 800; display: flex; justify-content: space-between;">
+            <span>Total Payment:</span>
+            <span class="cost-badge"><span id="delivery-total-val">0</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+          </div>
+        </div>
+
+        <form id="checkout-form" onsubmit="handleDeliverySubmit(event)">
+          <div class="form-group">
+            <label for="player-ign">Player Gamertag / IGN *</label>
+            <input type="text" id="player-ign" class="form-control" placeholder="e.g. Steve_Craftsman" required />
+          </div>
+
+          <div class="form-group">
+            <label for="player-dimension">Dimension Target *</label>
+            <select id="player-dimension" class="form-control" required>
+              <option value="Overworld (Surface / Caverns)">Overworld (Surface / Caverns)</option>
+              <option value="The Nether (Fortress Safezone)">The Nether (Fortress Safezone)</option>
+              <option value="The End (Outer Islands / Stronghold)">The End (Outer Islands / Stronghold)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Delivery Coordinates (X, Y, Z) *</label>
+            <div class="coord-grid">
+              <input type="number" id="coord-x" class="form-control" placeholder="X: 1240" required />
+              <input type="number" id="coord-y" class="form-control" placeholder="Y: 64" required />
+              <input type="number" id="coord-z" class="form-control" placeholder="Z: -890" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="player-notes">Special Instructions for Wandering Traders</label>
+            <input type="text" id="player-notes" class="form-control" placeholder="e.g. Leave in bedrock lockbox outside portal" />
+          </div>
+
+          <button type="submit" class="checkout-btn" style="padding: 1rem; font-size: 1.1rem;">
+            Deposit Emeralds & Confirm Transfer
+          </button>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <!-- SUCCESS CONFIRMATION PAGE -->
+  <div id="page-success" class="page-section">
+    <main class="container">
+      <div class="success-card">
+        <canvas id="particle-canvas"></canvas>
+
+        <img class="ender-chest-graphic" src="images/ender_chest.webp" alt="Ender Chest Sync" onerror="this.style.display='none'" />
+
+        <h2 style="color: var(--accent-emerald); font-size: 2.2rem; margin-bottom: 0.5rem;">Sync Protocol Complete!</h2>
+        <p style="color: var(--text-muted); font-size: 1.05rem;">Your transaction has been approved by the Village Cleric Guild. Your Ender Chest has synced across dimensions.</p>
+
+        <div class="receipt-box" id="success-receipt-content">
+          <div class="cleric-stamp">CURSE-FREE CERTIFIED</div>
+          <div id="receipt-dynamic-lines"></div>
+        </div>
+
+        <button class="cta-btn" onclick="resetStoreAndShopAgain()">Return to Armory</button>
       </div>
     </main>
   </div>
@@ -760,7 +1356,7 @@
   <footer>
     <div class="footer-grid">
       <div class="footer-col">
-        <h4>WandyT Company Warranty</h4>
+        <h4>WandyT Inc. Warranty</h4>
         <ul>
           <li>Free Grindstone Disenchantments</li>
           <li>30-Day Netherite Structural Guarantee</li>
@@ -788,9 +1384,416 @@
 
   <!-- Interactive Logic -->
   <script>
-    let totalEmeralds = 0;
+    let cart = [];
 
-    // Custom Cursor tracking
+    function toggleCartDrawer(open) {
+      const drawer = document.getElementById('cart-drawer');
+      const overlay = document.getElementById('cart-drawer-overlay');
+      if (open) {
+        drawer.classList.add('open');
+        overlay.classList.add('open');
+      } else {
+        drawer.classList.remove('open');
+        overlay.classList.remove('open');
+      }
+    }
+
+    function addToCart(button) {
+      const card = button.closest('.product-card');
+      const baseId = card.getAttribute('data-id');
+      const name = card.getAttribute('data-name') || card.querySelector('.item-title').textContent;
+      const price = parseInt(card.querySelector('.current-price').textContent);
+      const isNetherite = card.querySelector('.upgrade-toggle input')?.checked || false;
+      const tier = isNetherite ? 'Netherite' : (card.getAttribute('data-diamond-img') ? 'Diamond' : 'Arcana');
+      const imgSrc = card.querySelector('.product-image').src;
+
+      const itemKey = `${baseId}-${tier}`;
+      const existingItem = cart.find(item => item.cartKey === itemKey);
+
+      if (existingItem) {
+        existingItem.qty += 1;
+      } else {
+        cart.push({
+          cartKey: itemKey,
+          name: name,
+          tier: tier,
+          price: price,
+          imgSrc: imgSrc,
+          qty: 1
+        });
+      }
+
+      renderCart();
+
+      const originalText = button.textContent;
+      button.textContent = "Synced to Ender Chest!";
+      button.style.backgroundColor = "var(--accent-emerald)";
+      button.style.color = "#05140b";
+      
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.style.backgroundColor = "var(--card-bg)";
+        button.style.color = "var(--accent-emerald)";
+      }, 900);
+    }
+
+    function updateItemQty(cartKey, delta) {
+      const item = cart.find(i => i.cartKey === cartKey);
+      if (!item) return;
+
+      item.qty += delta;
+      if (item.qty <= 0) {
+        cart = cart.filter(i => i.cartKey !== cartKey);
+      }
+      renderCart();
+    }
+
+    function removeCartItem(cartKey) {
+      cart = cart.filter(i => i.cartKey !== cartKey);
+      renderCart();
+    }
+
+    function clearCart() {
+      cart = [];
+      renderCart();
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cart-items-list');
+      const counterQty = document.getElementById('cart-counter-qty');
+      const subtotalVal = document.getElementById('cart-subtotal-val');
+
+      const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+      const grandTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+      counterQty.textContent = totalItems;
+      subtotalVal.textContent = grandTotal;
+
+      if (cart.length === 0) {
+        container.innerHTML = `<div class="empty-cart-msg">Your Ender Chest is empty.<br>Select armaments to load storage.</div>`;
+        return;
+      }
+
+      container.innerHTML = cart.map(item => `
+        <div class="cart-item-row">
+          <img class="cart-item-img" src="${item.imgSrc}" alt="${item.name}">
+          <div class="cart-item-info">
+            <h4>${item.name}</h4>
+            <div class="cart-item-tier ${item.tier.toLowerCase()}">${item.tier} Tier</div>
+            <div class="cart-item-price">
+              <span class="cost-badge">${item.price}<img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
+          </div>
+          <div class="cart-qty-ctrls">
+            <button class="qty-btn" onclick="updateItemQty('${item.cartKey}', -1)">-</button>
+            <span class="qty-display">${item.qty}</span>
+            <button class="qty-btn" onclick="updateItemQty('${item.cartKey}', 1)">+</button>
+            <button class="remove-item-btn" title="Discard" onclick="removeCartItem('${item.cartKey}')">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function proceedToDelivery() {
+      if (cart.length === 0) {
+        alert("Your Ender Chest is empty! Pick your armaments first.");
+        return;
+      }
+      toggleCartDrawer(false);
+
+      const previewContainer = document.getElementById('delivery-items-preview');
+      const grandTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      document.getElementById('delivery-total-val').textContent = grandTotal;
+
+      previewContainer.innerHTML = cart.map(item => 
+        `<div>• ${item.qty}x ${item.name} (${item.tier}) - ${item.price * item.qty} EME</div>`
+      ).join('');
+
+      switchPage('delivery');
+    }
+
+    function playSuccessFanfare() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const actx = new AudioCtx();
+
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const osc = actx.createOscillator();
+          const gain = actx.createGain();
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, actx.currentTime + idx * 0.11);
+
+          gain.gain.setValueAtTime(0.2, actx.currentTime + idx * 0.11);
+          gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + idx * 0.11 + 0.35);
+
+          osc.connect(gain);
+          gain.connect(actx.destination);
+
+          osc.start(actx.currentTime + idx * 0.11);
+          osc.stop(actx.currentTime + idx * 0.11 + 0.35);
+        });
+      } catch (err) {}
+    }
+
+    // 5+ Second XP & Portal Particle Burst
+    function launchSuccessParticles() {
+      const pCanvas = document.getElementById('particle-canvas');
+      const pCtx = pCanvas.getContext('2d');
+      const parent = pCanvas.parentElement;
+
+      pCanvas.width = parent.offsetWidth;
+      pCanvas.height = parent.offsetHeight;
+
+      const particles = Array.from({ length: 80 }, () => ({
+        x: pCanvas.width / 2 + (Math.random() - 0.5) * 120,
+        y: 110 + (Math.random() - 0.5) * 60,
+        vx: (Math.random() - 0.5) * 2.2,
+        vy: -(Math.random() * 1.5 + 0.6),
+        size: Math.random() * 4 + 2,
+        color: Math.random() > 0.45 ? '#55ff55' : '#a855f7',
+        alpha: 1,
+        decay: Math.random() * 0.003 + 0.002
+      }));
+
+      function animate() {
+        pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+        let active = false;
+
+        particles.forEach(p => {
+          p.x += p.vx + Math.sin(p.y * 0.03) * 0.4;
+          p.y += p.vy;
+          p.alpha -= p.decay;
+
+          if (p.alpha > 0) {
+            active = true;
+            pCtx.save();
+            pCtx.globalAlpha = Math.max(0, p.alpha);
+            pCtx.fillStyle = p.color;
+            pCtx.shadowBlur = 8;
+            pCtx.shadowColor = p.color;
+            pCtx.fillRect(p.x, p.y, p.size, p.size);
+            pCtx.restore();
+          }
+        });
+
+        if (active) requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    function handleDeliverySubmit(e) {
+      e.preventDefault();
+      const ign = document.getElementById('player-ign').value;
+      const dimension = document.getElementById('player-dimension').value;
+      const x = document.getElementById('coord-x').value;
+      const y = document.getElementById('coord-y').value;
+      const z = document.getElementById('coord-z').value;
+      const grandTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      const txId = "WT-" + Math.floor(100000 + Math.random() * 900000);
+
+      const receiptLines = document.getElementById('receipt-dynamic-lines');
+      receiptLines.innerHTML = `
+        <div class="receipt-row"><span>TRANSACTION ID:</span> <span>#${txId}</span></div>
+        <div class="receipt-row"><span>RECIPIENT IGN:</span> <span>${ign}</span></div>
+        <div class="receipt-row"><span>DIMENSION:</span> <span>${dimension}</span></div>
+        <div class="receipt-row"><span>COORDINATES:</span> <span>X: ${x}, Y: ${y}, Z: ${z}</span></div>
+        <div class="receipt-row"><span>STATUS:</span> <span style="color: var(--accent-emerald); font-weight: bold;">Synced to Ender Chest</span></div>
+        <hr style="border-color: var(--border-color); margin: 0.8rem 0;">
+        <div class="receipt-row" style="font-weight: bold;">
+          <span>EMERALDS DEDUCTED:</span> 
+          <span class="cost-badge">${grandTotal}<img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+        </div>
+      `;
+
+      clearCart();
+      switchPage('success');
+      playSuccessFanfare();
+      launchSuccessParticles();
+    }
+
+    function resetStoreAndShopAgain() {
+      document.getElementById('checkout-form').reset();
+      switchPage('armory');
+    }
+
+    // --- Scaled Cobblestone & Hold-to-Mine Engine ---
+    const canvas = document.getElementById('cobble-canvas');
+    const ctx = canvas.getContext('2d');
+    const MINE_SIZE = 48;
+
+    const cobbleImg = new Image();
+    cobbleImg.src = 'images/cobblestone.png';
+
+    const destroyImg = new Image();
+    destroyImg.src = 'images/destroy_stages.png';
+
+    let scaledPattern = null;
+
+    function createScaledPattern(img, scale) {
+      const offscreen = document.createElement('canvas');
+      offscreen.width = img.naturalWidth * scale;
+      offscreen.height = img.naturalHeight * scale;
+      const offCtx = offscreen.getContext('2d');
+      offCtx.imageSmoothingEnabled = false;
+      offCtx.drawImage(img, 0, 0, offscreen.width, offscreen.height);
+      return ctx.createPattern(offscreen, 'repeat');
+    }
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      drawFullBackground();
+    }
+
+    function drawFullBackground() {
+      if (!scaledPattern && cobbleImg.complete && cobbleImg.naturalWidth > 0) {
+        scaledPattern = createScaledPattern(cobbleImg, 3);
+      }
+      if (scaledPattern) {
+        ctx.fillStyle = scaledPattern;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    cobbleImg.onload = () => {
+      scaledPattern = createScaledPattern(cobbleImg, 3);
+      drawFullBackground();
+    };
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    let miningActive = false;
+    let miningTimer = null;
+    let currentMineX = 0;
+    let currentMineY = 0;
+    const totalStages = 10;
+    const stageDuration = 150; // 10 * 150ms = 1500ms (1.5 seconds)
+
+    function drawProceduralCrack(x, y, size, stage, totalStages) {
+      ctx.save();
+      const progress = (stage + 1) / totalStages;
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      
+      const mid = size / 2;
+      const reach = mid * progress;
+      
+      ctx.moveTo(x + mid, y + mid);
+      ctx.lineTo(x + mid - reach, y + mid - reach);
+      ctx.moveTo(x + mid, y + mid);
+      ctx.lineTo(x + mid + reach, y + mid - reach * 0.8);
+      ctx.moveTo(x + mid, y + mid);
+      ctx.lineTo(x + mid - reach * 0.7, y + mid + reach);
+      ctx.moveTo(x + mid, y + mid);
+      ctx.lineTo(x + mid + reach * 0.9, y + mid + reach * 0.9);
+      
+      if (stage >= 3) {
+        ctx.moveTo(x + mid - reach * 0.5, y + mid);
+        ctx.lineTo(x + mid - reach, y + mid + reach * 0.4);
+        ctx.moveTo(x + mid + reach * 0.5, y + mid);
+        ctx.lineTo(x + mid + reach, y + mid - reach * 0.3);
+      }
+      ctx.stroke();
+
+      ctx.fillStyle = `rgba(0, 0, 0, ${progress * 0.5})`;
+      ctx.fillRect(x, y, size, size);
+      ctx.restore();
+    }
+
+    window.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      const interactiveTarget = e.target.closest('button, a, input, select, label, #cart-drawer, .product-card, .category-card, .story-content, .form-card, .success-card');
+      if (interactiveTarget) return;
+
+      const clickX = e.clientX;
+      const clickY = e.clientY;
+      currentMineX = Math.floor(clickX - MINE_SIZE / 2);
+      currentMineY = Math.floor(clickY - MINE_SIZE / 2);
+
+      miningActive = true;
+      let currentStage = 0;
+
+      miningTimer = setInterval(() => {
+        if (!miningActive) {
+          clearInterval(miningTimer);
+          return;
+        }
+
+        if (scaledPattern) {
+          ctx.fillStyle = scaledPattern;
+          ctx.fillRect(currentMineX, currentMineY, MINE_SIZE, MINE_SIZE);
+        }
+
+        let renderedSprite = false;
+        if (destroyImg.complete && destroyImg.naturalWidth > 0) {
+          ctx.imageSmoothingEnabled = false;
+          if (destroyImg.naturalWidth > destroyImg.naturalHeight) {
+            const spriteW = destroyImg.naturalWidth / totalStages;
+            const spriteH = destroyImg.naturalHeight;
+            ctx.drawImage(
+              destroyImg,
+              currentStage * spriteW, 0, spriteW, spriteH,
+              currentMineX, currentMineY, MINE_SIZE, MINE_SIZE
+            );
+            renderedSprite = true;
+          } else {
+            const spriteW = destroyImg.naturalWidth;
+            const spriteH = destroyImg.naturalHeight / totalStages;
+            ctx.drawImage(
+              destroyImg,
+              0, currentStage * spriteH, spriteW, spriteH,
+              currentMineX, currentMineY, MINE_SIZE, MINE_SIZE
+            );
+            renderedSprite = true;
+          }
+        }
+
+        if (!renderedSprite) {
+          drawProceduralCrack(currentMineX, currentMineY, MINE_SIZE, currentStage, totalStages);
+        }
+
+        currentStage++;
+
+        if (currentStage >= totalStages) {
+          clearInterval(miningTimer);
+          miningActive = false;
+
+          ctx.clearRect(currentMineX, currentMineY, MINE_SIZE, MINE_SIZE);
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+          ctx.fillRect(currentMineX, currentMineY, MINE_SIZE, MINE_SIZE);
+
+          const restoreX = currentMineX;
+          const restoreY = currentMineY;
+
+          setTimeout(() => {
+            if (scaledPattern) {
+              ctx.fillStyle = scaledPattern;
+              ctx.fillRect(restoreX, restoreY, MINE_SIZE, MINE_SIZE);
+            }
+          }, 1000);
+        }
+      }, stageDuration);
+    });
+
+    function cancelMining() {
+      if (miningActive) {
+        miningActive = false;
+        clearInterval(miningTimer);
+        if (scaledPattern) {
+          ctx.fillStyle = scaledPattern;
+          ctx.fillRect(currentMineX, currentMineY, MINE_SIZE, MINE_SIZE);
+        }
+      }
+    }
+
+    window.addEventListener('mouseup', cancelMining);
+    window.addEventListener('mouseleave', cancelMining);
+
     const cursor = document.getElementById('minecraft-cursor');
     document.addEventListener('mousemove', (e) => {
       cursor.style.left = e.clientX + 'px';
@@ -826,38 +1829,28 @@
       const upgradeCost = parseInt(card.getAttribute('data-upgrade-cost'));
       const priceDisplay = card.querySelector('.current-price');
       const badge = card.querySelector('.item-badge');
+      const itemImg = card.querySelector('.product-image');
+
+      const diamondSrc = card.getAttribute('data-diamond-img');
+      const netheriteSrc = card.getAttribute('data-netherite-img');
 
       if (checkbox.checked) {
         priceDisplay.textContent = basePrice + upgradeCost;
         badge.textContent = 'Netherite Tier';
         badge.style.color = '#df80ff';
         badge.style.backgroundColor = 'rgba(223, 128, 255, 0.15)';
+        if (itemImg && netheriteSrc) {
+          itemImg.src = netheriteSrc;
+        }
       } else {
         priceDisplay.textContent = basePrice;
         badge.textContent = 'Diamond Tier';
         badge.style.color = 'var(--accent-diamond)';
         badge.style.backgroundColor = 'rgba(77, 238, 234, 0.15)';
+        if (itemImg && diamondSrc) {
+          itemImg.src = diamondSrc;
+        }
       }
-    }
-
-    function addToCart(button) {
-      const card = button.closest('.product-card');
-      const price = parseInt(card.querySelector('.current-price').textContent);
-      totalEmeralds += price;
-      
-      const cartBtn = document.getElementById('cart-counter');
-      cartBtn.textContent = `🛒 Cart (${totalEmeralds} EME)`;
-
-      const originalText = button.textContent;
-      button.textContent = "Added to Ender Chest!";
-      button.style.backgroundColor = "var(--accent-emerald)";
-      button.style.color = "#05140b";
-      
-      setTimeout(() => {
-        button.textContent = originalText;
-        button.style.backgroundColor = "var(--card-bg)";
-        button.style.color = "var(--accent-emerald)";
-      }, 1000);
     }
   </script>
 </body>
