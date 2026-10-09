@@ -20,8 +20,7 @@
       --border-color: #523725;
     }
 
-    /* Global base desktop reset */
-    *, *:before, *:after {
+    * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -81,7 +80,6 @@
       filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.7));
     }
 
-    /* Hide cursor on touch devices by default, show only when actively mining */
     @media (max-width: 768px), (pointer: coarse) {
       #minecraft-cursor {
         display: none;
@@ -91,34 +89,24 @@
       }
     }
 
-    /* Right-side mining swing */
     #minecraft-cursor.mining-right {
       transform-origin: 4px 28px;
       animation: swingPickaxeRight 0.28s infinite alternate ease-in-out;
     }
 
     @keyframes swingPickaxeRight {
-      0% {
-        transform: translate(-4px, -28px) rotate(-15deg);
-      }
-      100% {
-        transform: translate(-4px, -28px) rotate(65deg);
-      }
+      0% { transform: translate(-4px, -28px) rotate(-15deg); }
+      100% { transform: translate(-4px, -28px) rotate(65deg); }
     }
 
-    /* Left-side mining swing */
     #minecraft-cursor.mining-left {
       transform-origin: 28px 28px;
       animation: swingPickaxeLeft 0.28s infinite alternate ease-in-out;
     }
 
     @keyframes swingPickaxeLeft {
-      0% {
-        transform: translate(-28px, -28px) scaleX(-1) rotate(15deg);
-      }
-      100% {
-        transform: translate(-28px, -28px) scaleX(-1) rotate(-65deg);
-      }
+      0% { transform: translate(-4px, -28px) scaleX(-1) rotate(-15deg); }
+      100% { transform: translate(-4px, -28px) scaleX(-1) rotate(65deg); }
     }
 
     .cost-badge {
@@ -139,7 +127,7 @@
       display: block;
     }
 
-    /* UI Panels using Stripped Dark Oak Log */
+    /* Standard UI Panels */
     header,
     .hero,
     .product-card,
@@ -222,7 +210,20 @@
       align-items: center;
     }
 
+    /* Brand Logo & Title Styling */
+    .brand-logo-img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
     .logo {
+      display: flex;
+      align-items: center;
       font-size: 1.3rem;
       font-weight: 800;
       color: var(--accent-emerald);
@@ -1072,7 +1073,7 @@
       z-index: 10;
     }
 
-    /* Ender Chest Graphic Container with Glow Aura */
+    /* Animated Ender Chest Graphic */
     .ender-chest-wrapper {
       width: 76px;
       height: 76px;
@@ -1172,11 +1173,9 @@
       margin-bottom: 0.5rem;
     }
 
-    /* Mobile Responsive Optimizations */
     @media (max-width: 768px) {
       .hero {
         grid-template-columns: 1fr;
-        padding: 2rem 1.5rem;
       }
       .category-grid {
         grid-template-columns: 1fr;
@@ -1193,14 +1192,6 @@
         display: inline-block;
         transform: rotate(0deg);
       }
-      .nav-container {
-        flex-direction: column;
-        gap: 1rem;
-        padding: 1rem;
-      }
-      .nav-links {
-        gap: 1rem;
-      }
     }
   </style>
 </head>
@@ -1216,7 +1207,7 @@
   <!-- Lucky Block Special Deal Modal -->
   <div id="lucky-modal-overlay">
     <div class="modal-box">
-      <!-- Replaced gift box & question mark with clean lucky block png -->
+      <!-- Lucky Block PNG without question marks -->
       <img src="images/lucky_blocks.png" class="modal-lucky-badge-img" alt="Lucky Block" />
       <h3 class="modal-title" id="lucky-offer-title">Lucky Deal Discovered!</h3>
       <p class="modal-desc" id="lucky-offer-desc">You cracked an ancient Lucky Block and unearthed an exclusive discount!</p>
@@ -1268,10 +1259,13 @@
     </div>
   </aside>
 
-  <!-- Top Navigation -->
+  <!-- Top Navigation with Brand Logo & Text -->
   <header>
     <div class="nav-container">
-      <div class="logo">WandyT Inc.</div>
+      <div class="logo">
+        <img class="brand-logo-img" src="images/logo.png" alt="Logo" onerror="this.style.display='none'">
+        WandyT Inc.
+      </div>
       <ul class="nav-links">
         <li><a id="nav-home" class="active" onclick="switchPage('home')">Home</a></li>
         <li><a id="nav-armory" onclick="switchPage('armory')">Armory</a></li>
@@ -1308,18 +1302,22 @@
     <main class="container">
       <h2 class="section-title">Armory Department</h2>
       <div class="category-grid">
+        <!-- 1. Cobblestone -->
         <div class="category-card cat-mining texture-cobblestone" onclick="switchPage('armory'); switchTab('tools-tab');">
           <h3>Mining</h3>
           <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Pickaxes, axes, and trench shovels built for heavy yield.</p>
         </div>
+        <!-- 2. Obsidian -->
         <div class="category-card cat-pvp texture-obsidian" onclick="switchPage('armory'); switchTab('armor-tab');">
           <h3>PvP</h3>
           <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Plate sets and battle-forged Totems of Undying.</p>
         </div>
+        <!-- 3. Redstone -->
         <div class="category-card cat-redstone texture-redstone" onclick="switchPage('armory'); switchTab('redstone-tab');">
           <h3>Redstone</h3>
           <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Comparators, Crafters, repeaters, and pulse power.</p>
         </div>
+        <!-- 4. Oak Planks -->
         <div class="category-card cat-books texture-oak-planks" onclick="switchPage('armory'); switchTab('librarian-tab');">
           <h3>Enchanted Books</h3>
           <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Potent tomes, mending scrolls, and swift sneak arcana.</p>
@@ -1938,18 +1936,8 @@
       }
     });
 
-    // Touch support on mobile devices
-    document.addEventListener('touchmove', (e) => {
-      if (e.touches.length > 0) {
-        cursor.style.left = e.touches[0].clientX + 'px';
-        cursor.style.top = e.touches[0].clientY + 'px';
-        currentSide = e.touches[0].clientX < window.innerWidth / 2 ? 'left' : 'right';
-      }
-    }, { passive: true });
-
     function applyMiningAnimation() {
       cursor.classList.remove('mining-left', 'mining-right');
-      cursor.classList.add('touch-active'); // Temporarily visible during mobile touch mining
       if (currentSide === 'left') {
         cursor.classList.add('mining-left');
       } else {
@@ -1958,7 +1946,7 @@
     }
 
     function stopMiningAnimation() {
-      cursor.classList.remove('mining-left', 'mining-right', 'touch-active');
+      cursor.classList.remove('mining-left', 'mining-right');
     }
 
     // --- Lucky Block Context Deals & Spawning Engine ---
@@ -2004,7 +1992,6 @@
       drawFullBackground();
     }
 
-    // Slashes 40-60% off an existing product from the active tab
     function triggerLuckyReward(tabId) {
       const activePane = document.getElementById(tabId);
       const cards = Array.from(activePane.querySelectorAll('.product-card'));
@@ -2013,7 +2000,7 @@
       const randomCard = cards[Math.floor(Math.random() * cards.length)];
 
       const baseName = randomCard.getAttribute('data-name') || randomCard.querySelector('.item-title').textContent;
-      const basePrice = parseInt(randomCard.getAttribute('data-base-price'));
+      const basePrice = parseInt(randomCard.querySelector('.current-price').textContent);
       const imgSrc = randomCard.querySelector('.product-image').src;
       const badgeText = randomCard.querySelector('.badge').textContent;
 
@@ -2442,20 +2429,27 @@
       ctx.restore();
     }
 
-    function startMining(clientX, clientY) {
+    window.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      const interactiveTarget = e.target.closest('button, a, input, select, label, #cart-drawer, .product-card, .category-card, .story-content, .form-card, .success-card, .modal-box');
+      if (interactiveTarget) return;
+
+      const clickX = e.clientX;
+      const clickY = e.clientY;
+
       targetLuckyBlock = activeLuckyBlocks.find(lb => 
         !lb.mined && 
         lb.tabId === currentActiveTab &&
-        clientX >= lb.x && clientX <= lb.x + lb.size &&
-        clientY >= lb.y && clientY <= lb.y + lb.size
+        clickX >= lb.x && clickX <= lb.x + lb.size &&
+        clickY >= lb.y && clickY <= lb.y + lb.size
       );
 
       if (targetLuckyBlock) {
         currentMineX = targetLuckyBlock.x;
         currentMineY = targetLuckyBlock.y;
       } else {
-        currentMineX = Math.floor(clientX - MINE_SIZE / 2);
-        currentMineY = Math.floor(clientY - MINE_SIZE / 2);
+        currentMineX = Math.floor(clickX - MINE_SIZE / 2);
+        currentMineY = Math.floor(clickY - MINE_SIZE / 2);
       }
 
       miningActive = true;
@@ -2520,29 +2514,7 @@
           }, 1000);
         }
       }, stageDuration);
-    }
-
-    window.addEventListener('mousedown', (e) => {
-      if (e.button !== 0) return;
-      const interactiveTarget = e.target.closest('button, a, input, select, label, #cart-drawer, .product-card, .category-card, .story-content, .form-card, .success-card, .modal-box');
-      if (interactiveTarget) return;
-
-      startMining(e.clientX, e.clientY);
     });
-
-    // Touch mining support on mobile
-    window.addEventListener('touchstart', (e) => {
-      if (e.touches.length > 0) {
-        const t = e.touches[0];
-        const interactiveTarget = e.target.closest('button, a, input, select, label, #cart-drawer, .product-card, .category-card, .story-content, .form-card, .success-card, .modal-box');
-        if (interactiveTarget) return;
-        
-        cursor.style.left = t.clientX + 'px';
-        cursor.style.top = t.clientY + 'px';
-        currentSide = t.clientX < window.innerWidth / 2 ? 'left' : 'right';
-        startMining(t.clientX, t.clientY);
-      }
-    }, { passive: true });
 
     function cancelMining() {
       if (miningActive) {
@@ -2555,8 +2527,6 @@
 
     window.addEventListener('mouseup', cancelMining);
     window.addEventListener('mouseleave', cancelMining);
-    window.addEventListener('touchend', cancelMining);
-    window.addEventListener('touchcancel', cancelMining);
 
     function switchPage(pageId) {
       document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
