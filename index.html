@@ -7,23 +7,31 @@
   <style>
     :root {
       --bg-dark: #090a0d;
-      --panel-bg: rgba(24, 26, 32, 0.94);
-      --card-bg: #21242d;
+      --panel-bg: rgba(45, 32, 22, 0.94);
+      --card-bg: #231812;
       --accent-emerald: #00d166;
       --accent-emerald-hover: #00b355;
       --accent-diamond: #4deeea;
       --accent-netherite: #df80ff;
+      --accent-redstone: #ff3333;
+      --accent-lucky: #ffcc00;
       --text-main: #f0f2f5;
-      --text-muted: #9aa0a6;
-      --border-color: #2c303c;
+      --text-muted: #d9cec7;
+      --border-color: #523725;
     }
 
-    * {
+    /* Global base desktop reset */
+    *, *:before, *:after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      cursor: none !important;
+    }
+
+    @media (min-width: 769px) and (pointer: fine) {
+      *, *:before, *:after, input, button, select, label, a {
+        cursor: none !important;
+      }
     }
 
     body {
@@ -34,8 +42,10 @@
       min-height: 100vh;
       overflow-x: hidden;
       user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
+    /* Fixed Interactive Stone Canvas */
     #cobble-canvas {
       position: fixed;
       top: 0;
@@ -47,37 +57,68 @@
       image-rendering: crisp-edges;
     }
 
+    /* Custom Diamond Pickaxe Cursor */
     #minecraft-cursor {
       position: fixed;
       top: 0;
       left: 0;
-      width: 16px;
-      height: 16px;
+      width: 32px;
+      height: 32px;
       pointer-events: none;
-      z-index: 99999;
-      transform: translate(-50%, -50%);
-      mix-blend-mode: difference;
+      z-index: 999999;
+      transform-origin: 4px 28px;
+      transform: translate(-4px, -28px);
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
     }
 
-    #minecraft-cursor::before,
-    #minecraft-cursor::after {
-      content: '';
-      position: absolute;
-      background-color: white;
+    #minecraft-cursor img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      image-rendering: pixelated;
+      filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.7));
     }
 
-    #minecraft-cursor::before {
-      top: 7px;
-      left: 2px;
-      width: 12px;
-      height: 2px;
+    /* Hide cursor on touch devices by default, show only when actively mining */
+    @media (max-width: 768px), (pointer: coarse) {
+      #minecraft-cursor {
+        display: none;
+      }
+      #minecraft-cursor.touch-active {
+        display: block !important;
+      }
     }
 
-    #minecraft-cursor::after {
-      top: 2px;
-      left: 7px;
-      width: 2px;
-      height: 12px;
+    /* Right-side mining swing */
+    #minecraft-cursor.mining-right {
+      transform-origin: 4px 28px;
+      animation: swingPickaxeRight 0.28s infinite alternate ease-in-out;
+    }
+
+    @keyframes swingPickaxeRight {
+      0% {
+        transform: translate(-4px, -28px) rotate(-15deg);
+      }
+      100% {
+        transform: translate(-4px, -28px) rotate(65deg);
+      }
+    }
+
+    /* Left-side mining swing */
+    #minecraft-cursor.mining-left {
+      transform-origin: 28px 28px;
+      animation: swingPickaxeLeft 0.28s infinite alternate ease-in-out;
+    }
+
+    @keyframes swingPickaxeLeft {
+      0% {
+        transform: translate(-28px, -28px) scaleX(-1) rotate(15deg);
+      }
+      100% {
+        transform: translate(-28px, -28px) scaleX(-1) rotate(-65deg);
+      }
     }
 
     .cost-badge {
@@ -98,10 +139,75 @@
       display: block;
     }
 
+    /* UI Panels using Stripped Dark Oak Log */
+    header,
+    .hero,
+    .product-card,
+    .story-content,
+    .form-card,
+    .success-card,
+    footer,
+    #cart-drawer,
+    .tabs-nav,
+    .trust-banner,
+    .modal-box {
+      background-color: #3b281d;
+      background-image: linear-gradient(rgba(24, 16, 12, 0.4), rgba(24, 16, 12, 0.4)), url('images/stripped_dark_oak_log.png');
+      background-size: auto, 64px 64px;
+      image-rendering: pixelated;
+      border: 2px solid #5a3c29;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Category Cards Custom Textures */
+    .category-card {
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      image-rendering: pixelated;
+    }
+
+    .category-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .cat-mining {
+      background-color: #4b4b4b !important;
+      background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url('images/cobblestone.png') !important;
+      background-size: auto, 48px 48px !important;
+      border: 2px solid #6b6b6b !important;
+    }
+    .cat-mining:hover { border-color: #a0a0a0 !important; }
+
+    .cat-pvp {
+      background-color: #12091c !important;
+      background-image: linear-gradient(rgba(18, 9, 28, 0.4), rgba(18, 9, 28, 0.4)), url('images/obsidian.png') !important;
+      background-size: auto, 48px 48px !important;
+      border: 2px solid #4a2272 !important;
+    }
+    .cat-pvp:hover { border-color: var(--accent-diamond) !important; }
+
+    .cat-redstone {
+      background-color: #520b0b !important;
+      background-image: linear-gradient(rgba(40, 5, 5, 0.35), rgba(40, 5, 5, 0.35)), url('images/redstone.png') !important;
+      background-size: auto, 48px 48px !important;
+      border: 2px solid #8f1717 !important;
+    }
+    .cat-redstone:hover { border-color: #ff5555 !important; }
+
+    .cat-books {
+      background-color: #634324 !important;
+      background-image: linear-gradient(rgba(35, 20, 10, 0.25), rgba(35, 20, 10, 0.25)), url('images/oak_planks.png') !important;
+      background-size: auto, 48px 48px !important;
+      border: 2px solid #8e6236 !important;
+    }
+    .cat-books:hover { border-color: #c4925e !important; }
+
     header {
-      background-color: var(--panel-bg);
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid var(--border-color);
+      backdrop-filter: blur(8px) brightness(1.1);
+      border-bottom: 3px solid #5a3c29;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -121,6 +227,7 @@
       font-weight: 800;
       color: var(--accent-emerald);
       letter-spacing: 0.5px;
+      text-shadow: 2px 2px 0px #000;
     }
 
     .nav-links {
@@ -132,8 +239,8 @@
     .nav-links a {
       color: var(--text-muted);
       text-decoration: none;
-      font-weight: 500;
-      cursor: pointer;
+      font-weight: 700;
+      text-shadow: 1px 1px 2px #000;
       transition: color 0.2s ease;
     }
 
@@ -142,13 +249,12 @@
     }
 
     .cart-btn {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
+      background: rgba(26, 17, 13, 0.88);
+      border: 2px solid #5a3c29;
       padding: 0.5rem 1rem;
       border-radius: 6px;
       color: var(--accent-emerald);
-      font-weight: 600;
-      cursor: pointer;
+      font-weight: 700;
       display: flex;
       align-items: center;
       gap: 0.3rem;
@@ -159,6 +265,125 @@
       border-color: var(--accent-emerald);
     }
 
+    .upgrade-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 0.4rem 0;
+      padding: 6px 10px;
+      font-size: 0.88rem;
+      color: var(--accent-netherite);
+      font-weight: 700;
+      line-height: 1.2;
+      text-shadow: 1px 1px 1px #000;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(223, 128, 255, 0.25);
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .upgrade-toggle:hover {
+      background: rgba(223, 128, 255, 0.15);
+      border-color: var(--accent-netherite);
+    }
+
+    .upgrade-toggle input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent-netherite);
+      flex-shrink: 0;
+    }
+
+    /* Lucky Offer Modal */
+    #lucky-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(5px);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #lucky-modal-overlay.open {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-box {
+      border: 3px solid var(--accent-lucky) !important;
+      border-radius: 12px;
+      padding: 2.5rem;
+      max-width: 520px;
+      width: 90vw;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 0 35px rgba(255, 204, 0, 0.45);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-lucky-badge-img {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 0.75rem;
+      display: block;
+      object-fit: contain;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      animation: floatBadge 2s infinite alternate ease-in-out;
+      filter: drop-shadow(0 4px 12px rgba(255, 204, 0, 0.5));
+    }
+
+    @keyframes floatBadge {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-8px); }
+    }
+
+    .modal-title {
+      color: var(--accent-lucky);
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 2px 2px 0px #000;
+    }
+
+    .modal-desc {
+      color: var(--text-main);
+      font-size: 1.05rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-item-preview {
+      background: rgba(20, 12, 8, 0.85);
+      border: 2px dashed var(--accent-lucky);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .modal-item-img {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 6px;
+      padding: 4px;
+    }
+
     /* Cart Drawer */
     #cart-drawer-overlay {
       position: fixed;
@@ -166,7 +391,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.75);
       backdrop-filter: blur(4px);
       z-index: 200;
       opacity: 0;
@@ -186,12 +411,11 @@
       width: 400px;
       max-width: 90vw;
       height: 100vh;
-      background-color: #16181f;
-      border-left: 2px solid var(--border-color);
+      border-left: 3px solid #5a3c29;
       z-index: 201;
       display: flex;
       flex-direction: column;
-      box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+      box-shadow: -10px 0 30px rgba(0,0,0,0.85);
       transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -201,7 +425,7 @@
 
     .drawer-header {
       padding: 1.5rem;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 2px solid #5a3c29;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -213,6 +437,7 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      text-shadow: 1px 1px 0 #000;
     }
 
     .close-drawer-btn {
@@ -220,7 +445,6 @@
       border: none;
       color: var(--text-muted);
       font-size: 1.5rem;
-      cursor: pointer;
       line-height: 1;
     }
 
@@ -242,6 +466,7 @@
       color: var(--text-muted);
       margin-top: 3rem;
       font-size: 0.95rem;
+      text-shadow: 1px 1px 2px #000;
     }
 
     .cart-item-row {
@@ -249,8 +474,8 @@
       grid-template-columns: 50px 1fr auto;
       gap: 0.8rem;
       align-items: center;
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
+      background: rgba(22, 14, 11, 0.92);
+      border: 1px solid #5a3c29;
       border-radius: 6px;
       padding: 0.6rem;
     }
@@ -260,7 +485,7 @@
       height: 48px;
       object-fit: contain;
       image-rendering: pixelated;
-      background-color: #131418;
+      background-color: #170d0a;
       border-radius: 4px;
       padding: 4px;
     }
@@ -279,6 +504,18 @@
       color: var(--accent-netherite);
     }
 
+    .cart-item-tier.redstone {
+      color: var(--accent-redstone);
+    }
+
+    .cart-item-tier.relic {
+      color: #ffd700;
+    }
+
+    .cart-item-tier.lucky {
+      color: var(--accent-lucky);
+    }
+
     .cart-item-price {
       font-size: 0.95rem;
       font-weight: 700;
@@ -295,15 +532,14 @@
     }
 
     .qty-btn {
-      background: #111317;
-      border: 1px solid var(--border-color);
+      background: #1e130f;
+      border: 1px solid #5a3c29;
       color: var(--text-main);
       width: 24px;
       height: 24px;
       border-radius: 4px;
       font-weight: 700;
       font-size: 0.85rem;
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -326,14 +562,13 @@
       border: none;
       color: #ff5252;
       font-size: 0.8rem;
-      cursor: pointer;
       margin-left: 0.2rem;
     }
 
     .drawer-footer {
       padding: 1.5rem;
-      border-top: 1px solid var(--border-color);
-      background-color: #121318;
+      border-top: 2px solid #5a3c29;
+      background: rgba(22, 14, 11, 0.96);
     }
 
     .drawer-total {
@@ -359,7 +594,6 @@
       border-radius: 6px;
       font-weight: 800;
       border: none;
-      cursor: pointer;
       font-size: 1rem;
       transition: background 0.2s;
     }
@@ -374,7 +608,6 @@
       margin-top: 0.8rem;
       color: var(--text-muted);
       font-size: 0.8rem;
-      cursor: pointer;
       background: none;
       border: none;
       width: 100%;
@@ -395,20 +628,20 @@
       max-width: 1200px;
       margin: 2rem auto;
       padding: 3rem 2rem;
-      background: linear-gradient(135deg, rgba(27, 30, 39, 0.95) 0%, rgba(17, 19, 24, 0.95) 100%);
       border-radius: 12px;
-      border: 1px solid var(--border-color);
+      border: 3px solid #5a3c29;
       display: grid;
       grid-template-columns: 1.2fr 0.8fr;
       gap: 2rem;
       align-items: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
     }
 
     .hero-content h1 {
       font-size: 2.5rem;
       margin-bottom: 1rem;
       line-height: 1.2;
+      text-shadow: 2px 2px 4px #000;
     }
 
     .hero-content span {
@@ -419,6 +652,7 @@
       color: var(--text-muted);
       margin-bottom: 1.5rem;
       font-size: 1.1rem;
+      text-shadow: 1px 1px 2px #000;
     }
 
     .hero-image {
@@ -426,8 +660,8 @@
       height: 300px;
       object-fit: cover;
       border-radius: 8px;
-      border: 1px solid var(--border-color);
-      background-color: var(--card-bg);
+      border: 2px solid #5a3c29;
+      background-color: #231812;
     }
 
     .cta-btn {
@@ -439,7 +673,6 @@
       text-decoration: none;
       display: inline-block;
       border: none;
-      cursor: pointer;
       transition: background 0.2s;
     }
 
@@ -448,9 +681,8 @@
     }
 
     .trust-banner {
-      background-color: var(--panel-bg);
-      border-top: 1px solid var(--border-color);
-      border-bottom: 1px solid var(--border-color);
+      border-top: 2px solid #5a3c29;
+      border-bottom: 2px solid #5a3c29;
       padding: 1.2rem 2rem;
     }
 
@@ -465,9 +697,10 @@
     }
 
     .trust-item {
-      font-weight: 600;
+      font-weight: 700;
       color: var(--text-muted);
       font-size: 0.95rem;
+      text-shadow: 1px 1px 2px #000;
     }
 
     .trust-item span {
@@ -492,35 +725,20 @@
 
     .category-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 1.5rem;
       margin-bottom: 3.5rem;
     }
 
-    .category-card {
-      background-color: var(--panel-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 1.5rem;
-      text-align: center;
-      cursor: pointer;
-      transition: transform 0.2s ease, border-color 0.2s ease;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
-
-    .category-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent-diamond);
-    }
-
+    /* Tab Controls */
     .tabs-nav {
       display: flex;
       gap: 1rem;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 3px solid #5a3c29;
       margin-bottom: 2rem;
-      background-color: var(--panel-bg);
       border-radius: 8px 8px 0 0;
       padding: 0.5rem 1rem 0;
+      overflow-x: auto;
     }
 
     .tab-btn {
@@ -530,29 +748,37 @@
       font-size: 1.1rem;
       font-weight: 700;
       padding: 0.8rem 1.5rem;
-      cursor: pointer;
       position: relative;
       transition: color 0.2s ease;
+      text-shadow: 1px 1px 2px #000;
+      white-space: nowrap;
     }
 
     .tab-btn:hover {
       color: var(--text-main);
     }
 
-    .tab-btn.active {
-      color: var(--accent-emerald);
-    }
-
     .tab-btn.active::after {
       content: "";
       position: absolute;
-      bottom: -1px;
+      bottom: -3px;
       left: 0;
       right: 0;
-      height: 3px;
-      background-color: var(--accent-emerald);
+      height: 4px;
       border-radius: 3px 3px 0 0;
     }
+
+    #btn-tools-tab.active { color: var(--accent-diamond); }
+    #btn-tools-tab.active::after { background-color: var(--accent-diamond); }
+
+    #btn-armor-tab.active { color: var(--accent-netherite); }
+    #btn-armor-tab.active::after { background-color: var(--accent-netherite); }
+
+    #btn-redstone-tab.active { color: var(--accent-redstone); }
+    #btn-redstone-tab.active::after { background-color: var(--accent-redstone); }
+
+    #btn-librarian-tab.active { color: var(--accent-emerald); }
+    #btn-librarian-tab.active::after { background-color: var(--accent-emerald); }
 
     .tab-pane {
       display: none;
@@ -569,23 +795,54 @@
       margin-bottom: 3.5rem;
     }
 
+    /* Product Cards Shared Textured Classes */
+    .texture-cobblestone {
+      background-color: #4b4b4b !important;
+      background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url('images/cobblestone.png') !important;
+      background-size: auto, 48px 48px !important;
+      border: 2px solid #6b6b6b !important;
+      image-rendering: pixelated;
+    }
+
+    .texture-obsidian {
+      background-color: #12091c !important;
+      background-image: linear-gradient(rgba(18, 9, 28, 0.45), rgba(18, 9, 28, 0.45)), url('images/obsidian.png') !important;
+      background-size: auto, 48px 48px !important;
+      border: 2px solid #4a2272 !important;
+      image-rendering: pixelated;
+    }
+
+    .texture-redstone {
+      background-color: #520b0b !important;
+      background-image: linear-gradient(rgba(40, 5, 5, 0.38), rgba(40, 5, 5, 0.38)), url('images/redstone.png') !important;
+      background-size: auto, 48px 48px !important;
+      border: 2px solid #8f1717 !important;
+      image-rendering: pixelated;
+    }
+
+    .texture-oak-planks {
+      background-color: #634324 !important;
+      background-image: linear-gradient(rgba(35, 20, 10, 0.3), rgba(35, 20, 10, 0.3)), url('images/oak_planks.png') !important;
+      background-size: auto, 48px 48px !important;
+      border: 2px solid #8e6236 !important;
+      image-rendering: pixelated;
+    }
+
     .product-card {
-      background-color: var(--panel-bg);
-      border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 1.2rem;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
     }
 
     .product-image {
       width: 100%;
       height: 180px;
       object-fit: contain;
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
+      background-color: rgba(18, 12, 8, 0.75);
+      border: 2px solid rgba(0, 0, 0, 0.4);
       border-radius: 6px;
       padding: 1.5rem;
       margin-bottom: 1rem;
@@ -609,13 +866,23 @@
     }
 
     .badge-diamond {
-      background-color: rgba(77, 238, 234, 0.15);
+      background-color: rgba(77, 238, 234, 0.25);
       color: var(--accent-diamond);
     }
 
     .badge-book {
-      background-color: rgba(220, 100, 255, 0.15);
+      background-color: rgba(220, 100, 255, 0.25);
       color: #df80ff;
+    }
+
+    .badge-redstone {
+      background-color: rgba(255, 51, 51, 0.25);
+      color: var(--accent-redstone);
+    }
+
+    .badge-relic {
+      background-color: rgba(255, 215, 0, 0.25);
+      color: #ffd700;
     }
 
     .price-tag {
@@ -627,63 +894,98 @@
       align-items: center;
       gap: 6px;
       line-height: 1;
+      text-shadow: 1px 1px 2px #000;
     }
 
-    .upgrade-toggle {
+    /* Cart Action Row with Minus & Plus Buttons */
+    .cart-actions-row {
       display: flex;
       align-items: center;
       gap: 0.45rem;
-      margin: 0.5rem 0;
-      font-size: 0.85rem;
-      color: var(--accent-netherite);
-      font-weight: 600;
-      cursor: pointer;
-      line-height: 1;
+      width: 100%;
     }
 
     .add-to-cart-btn {
-      width: 100%;
-      background-color: var(--card-bg);
-      border: 1px solid var(--accent-emerald);
+      flex: 1;
+      background-color: rgba(26, 17, 13, 0.9);
+      border: 2px solid var(--accent-emerald);
       color: var(--accent-emerald);
       padding: 0.6rem;
       border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
+      font-weight: 700;
       transition: all 0.2s ease;
+      text-align: center;
+      text-shadow: 1px 1px 2px #000;
     }
 
     .add-to-cart-btn:hover {
       background-color: var(--accent-emerald);
       color: #05140b;
+      text-shadow: none;
+    }
+
+    .quick-qty-btn {
+      width: 38px;
+      height: 38px;
+      background-color: rgba(26, 17, 13, 0.9);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      line-height: 1;
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    .quick-plus-btn {
+      border: 2px solid var(--accent-emerald);
+      color: var(--accent-emerald);
+    }
+
+    .quick-plus-btn:hover {
+      background-color: var(--accent-emerald);
+      color: #05140b;
+      transform: scale(1.08);
+    }
+
+    .quick-minus-btn {
+      border: 2px solid #ff5252;
+      color: #ff5252;
+    }
+
+    .quick-minus-btn:hover {
+      background-color: #ff5252;
+      color: #05140b;
+      transform: scale(1.08);
     }
 
     .sale-banner {
-      background: rgba(223, 128, 255, 0.1);
-      border: 1px solid var(--accent-netherite);
+      background: rgba(223, 128, 255, 0.2);
+      border: 2px solid var(--accent-netherite);
       padding: 1rem 1.5rem;
       border-radius: 8px;
       margin-bottom: 2rem;
       text-align: center;
-      color: var(--accent-netherite);
-      font-weight: 600;
-      background-color: var(--panel-bg);
+      color: #fff;
+      font-weight: 700;
+      text-shadow: 1px 1px 2px #000;
     }
 
     .story-content {
-      background-color: var(--panel-bg);
-      border: 1px solid var(--border-color);
+      border: 3px solid #5a3c29;
       border-radius: 12px;
       padding: 3rem;
       max-width: 900px;
       margin: 0 auto;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
     }
 
     .story-content h2 {
       color: var(--accent-emerald);
       margin-bottom: 1.5rem;
       font-size: 2rem;
+      text-shadow: 2px 2px 4px #000;
     }
 
     .story-content p {
@@ -691,17 +993,17 @@
       margin-bottom: 1.5rem;
       font-size: 1.05rem;
       line-height: 1.8;
+      text-shadow: 1px 1px 2px #000;
     }
 
     /* Checkout & Delivery Protocol */
     .form-card {
-      background-color: var(--panel-bg);
-      border: 1px solid var(--border-color);
+      border: 3px solid #5a3c29;
       border-radius: 12px;
       padding: 2.5rem;
       max-width: 650px;
       margin: 0 auto;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
     }
 
     .form-group {
@@ -711,15 +1013,16 @@
     .form-group label {
       display: block;
       margin-bottom: 0.5rem;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--text-main);
       font-size: 0.95rem;
+      text-shadow: 1px 1px 2px #000;
     }
 
     .form-control {
       width: 100%;
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
+      background-color: rgba(22, 14, 11, 0.9);
+      border: 2px solid #5a3c29;
       border-radius: 6px;
       padding: 0.8rem 1rem;
       color: var(--text-main);
@@ -739,17 +1042,16 @@
     }
 
     .order-summary-box {
-      background-color: #121318;
-      border: 1px solid var(--border-color);
+      background-color: rgba(22, 14, 11, 0.95);
+      border: 2px solid #5a3c29;
       border-radius: 8px;
       padding: 1.2rem;
       margin-bottom: 1.5rem;
     }
 
-    /* Success Page Animations & Effects */
+    /* Success Page */
     .success-card {
-      background-color: var(--panel-bg);
-      border: 2px solid var(--accent-emerald);
+      border: 3px solid var(--accent-emerald);
       border-radius: 12px;
       padding: 3rem;
       max-width: 650px;
@@ -757,7 +1059,7 @@
       text-align: center;
       position: relative;
       overflow: visible;
-      box-shadow: 0 10px 40px rgba(0, 209, 102, 0.25);
+      box-shadow: 0 10px 40px rgba(0, 209, 102, 0.35);
     }
 
     #particle-canvas {
@@ -770,17 +1072,23 @@
       z-index: 10;
     }
 
-    /* Animated Ender Chest WebP */
-    .ender-chest-graphic {
+    /* Ender Chest Graphic Container with Glow Aura */
+    .ender-chest-wrapper {
       width: 76px;
       height: 76px;
       margin: 0 auto 1.5rem;
+      position: relative;
+      animation: chestFloat 2.5s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 16px rgba(77, 238, 234, 0.8)) drop-shadow(0 0 26px rgba(168, 85, 247, 0.9));
+    }
+
+    .ender-chest-graphic {
+      width: 100%;
+      height: 100%;
       display: block;
       object-fit: contain;
       image-rendering: pixelated;
       image-rendering: crisp-edges;
-      filter: drop-shadow(0 0 16px rgba(77, 238, 234, 0.7)) drop-shadow(0 0 25px rgba(168, 85, 247, 0.8));
-      animation: chestFloat 2.5s ease-in-out infinite alternate;
     }
 
     @keyframes chestFloat {
@@ -792,16 +1100,16 @@
       }
     }
 
-    /* Receipt Box & Repositioned Cleric Stamp */
     .receipt-box {
-      background-color: #121318;
-      border: 2px solid #232733;
+      background-color: rgba(22, 14, 11, 0.96);
+      border: 2px solid #5a3c29;
       border-radius: 8px;
       padding: 2.2rem 1.8rem 1.5rem;
       text-align: left;
       margin: 2.2rem 0;
       font-family: monospace;
       position: relative;
+      overflow: visible;
     }
 
     .cleric-stamp {
@@ -810,7 +1118,7 @@
       top: -18px;
       border: 2px dashed var(--accent-emerald);
       color: var(--accent-emerald);
-      background-color: #121318;
+      background-color: #231812;
       padding: 0.35rem 0.75rem;
       font-weight: 900;
       font-size: 0.8rem;
@@ -835,8 +1143,7 @@
     }
 
     footer {
-      background-color: var(--panel-bg);
-      border-top: 1px solid var(--border-color);
+      border-top: 3px solid #5a3c29;
       padding: 3rem 2rem;
       color: var(--text-muted);
       font-size: 0.9rem;
@@ -854,6 +1161,7 @@
     .footer-col h4 {
       color: var(--text-main);
       margin-bottom: 1rem;
+      text-shadow: 1px 1px 2px #000;
     }
 
     .footer-col ul {
@@ -864,9 +1172,11 @@
       margin-bottom: 0.5rem;
     }
 
+    /* Mobile Responsive Optimizations */
     @media (max-width: 768px) {
       .hero {
         grid-template-columns: 1fr;
+        padding: 2rem 1.5rem;
       }
       .category-grid {
         grid-template-columns: 1fr;
@@ -883,13 +1193,56 @@
         display: inline-block;
         transform: rotate(0deg);
       }
+      .nav-container {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+      }
+      .nav-links {
+        gap: 1rem;
+      }
     }
   </style>
 </head>
 <body>
 
   <canvas id="cobble-canvas"></canvas>
-  <div id="minecraft-cursor"></div>
+
+  <!-- Pickaxe Cursor Element -->
+  <div id="minecraft-cursor">
+    <img src="images/diamond_pickaxe.png" alt="Cursor" />
+  </div>
+
+  <!-- Lucky Block Special Deal Modal -->
+  <div id="lucky-modal-overlay">
+    <div class="modal-box">
+      <!-- Replaced gift box & question mark with clean lucky block png -->
+      <img src="images/lucky_blocks.png" class="modal-lucky-badge-img" alt="Lucky Block" />
+      <h3 class="modal-title" id="lucky-offer-title">Lucky Deal Discovered!</h3>
+      <p class="modal-desc" id="lucky-offer-desc">You cracked an ancient Lucky Block and unearthed an exclusive discount!</p>
+      
+      <div class="modal-item-preview">
+        <img id="lucky-item-img" class="modal-item-img" src="" alt="Discounted Item" />
+        <div style="text-align: left; flex: 1;">
+          <h4 id="lucky-item-name" style="color: var(--accent-lucky); font-size: 1.15rem; margin-bottom: 2px;">Item Name</h4>
+          <span id="lucky-item-tier" style="font-size: 0.8rem; color: var(--text-muted);">Special Reward</span>
+        </div>
+        <div style="text-align: right;">
+          <div id="lucky-item-orig" style="text-decoration: line-through; color: #ff5252; font-size: 0.85rem;">0 EME</div>
+          <div class="cost-badge" style="font-size: 1.3rem; font-weight: 800; color: var(--accent-emerald);">
+            <span id="lucky-item-price">0</span><img class="emerald-icon" src="images/emerald.png" alt="EME">
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 1rem;">
+        <button class="checkout-btn" style="background-color: var(--accent-lucky); color: #000;" onclick="claimLuckyDeal()">
+          Claim & Sync to Cart
+        </button>
+        <button class="add-to-cart-btn" onclick="closeLuckyModal()">Dismiss</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Cart Drawer -->
   <div id="cart-drawer-overlay" onclick="toggleCartDrawer(false)"></div>
@@ -935,7 +1288,7 @@
     <section class="hero">
       <div class="hero-content">
         <h1>Forged for the Deep Dark, <span>Enchanted for Eternity</span></h1>
-        <p>Equip yourself with Diamond and Netherite-grade equipment from WandyT Inc. Certified curse-free by the Village Cleric Guild.</p>
+        <p>Equip yourself with Diamond, Netherite, and Automation equipment from WandyT Inc. Certified curse-free by the Village Cleric Guild.</p>
         <button class="cta-btn" onclick="switchPage('armory'); switchTab('tools-tab');">
           Browse the Anvil Armory
         </button>
@@ -955,17 +1308,21 @@
     <main class="container">
       <h2 class="section-title">Armory Department</h2>
       <div class="category-grid">
-        <div class="category-card" onclick="switchPage('armory'); switchTab('tools-tab');">
+        <div class="category-card cat-mining texture-cobblestone" onclick="switchPage('armory'); switchTab('tools-tab');">
           <h3>Mining</h3>
           <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Pickaxes, axes, and trench shovels built for heavy yield.</p>
         </div>
-        <div class="category-card" onclick="switchPage('armory'); switchTab('armor-tab');">
+        <div class="category-card cat-pvp texture-obsidian" onclick="switchPage('armory'); switchTab('armor-tab');">
           <h3>PvP</h3>
-          <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Full plate sets forged for Nether and Warden raids.</p>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Plate sets and battle-forged Totems of Undying.</p>
         </div>
-        <div class="category-card" onclick="switchPage('armory'); switchTab('librarian-tab');">
+        <div class="category-card cat-redstone texture-redstone" onclick="switchPage('armory'); switchTab('redstone-tab');">
+          <h3>Redstone</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Comparators, Crafters, repeaters, and pulse power.</p>
+        </div>
+        <div class="category-card cat-books texture-oak-planks" onclick="switchPage('armory'); switchTab('librarian-tab');">
           <h3>Enchanted Books</h3>
-          <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">High-potency tomes, mending scrolls, and swift sneak arcana.</p>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Potent tomes, mending scrolls, and swift sneak arcana.</p>
         </div>
       </div>
     </main>
@@ -978,15 +1335,15 @@
 
       <div class="tabs-nav">
         <button class="tab-btn active" id="btn-tools-tab" onclick="switchTab('tools-tab')">Tools</button>
-        <button class="tab-btn" id="btn-armor-tab" onclick="switchTab('armor-tab')">Armour</button>
+        <button class="tab-btn" id="btn-armor-tab" onclick="switchTab('armor-tab')">Armour & PvP</button>
+        <button class="tab-btn" id="btn-redstone-tab" onclick="switchTab('redstone-tab')">Redstone</button>
         <button class="tab-btn" id="btn-librarian-tab" onclick="switchTab('librarian-tab')">Enchanted Books</button>
       </div>
 
-      <!-- TAB 1: TOOLS -->
+      <!-- TAB 1: TOOLS (MINING) -->
       <div class="tab-pane active" id="tools-tab">
         <div class="product-grid">
-          <!-- Pickaxe -->
-          <div class="product-card" 
+          <div class="product-card texture-cobblestone" 
                data-id="tool-pickaxe"
                data-name="Excavator Pickaxe"
                data-base-price="32" 
@@ -1004,11 +1361,14 @@
             <div class="price-tag">
               Price: <span class="cost-badge"><span class="current-price">32</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
           </div>
 
-          <!-- Axe -->
-          <div class="product-card" 
+          <div class="product-card texture-cobblestone" 
                data-id="tool-axe"
                data-name="Timber & Cleave Axe"
                data-base-price="28" 
@@ -1026,11 +1386,14 @@
             <div class="price-tag">
               Price: <span class="cost-badge"><span class="current-price">28</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
           </div>
 
-          <!-- Shovel -->
-          <div class="product-card" 
+          <div class="product-card texture-cobblestone" 
                data-id="tool-shovel"
                data-name="Dune Trench Shovel"
                data-base-price="16" 
@@ -1048,16 +1411,37 @@
             <div class="price-tag">
               Price: <span class="cost-badge"><span class="current-price">16</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- TAB 2: ARMOUR -->
+      <!-- TAB 2: ARMOUR & PVP -->
       <div class="tab-pane" id="armor-tab">
         <div class="product-grid">
-          <!-- Helmet -->
-          <div class="product-card" 
+          <div class="product-card texture-obsidian" 
+               data-id="pvp-totem"
+               data-name="Totem of Undying"
+               data-base-price="44">
+            <img class="product-image" src="images/totem_of_undying.png" alt="Totem of Undying" />
+            <span class="badge badge-relic item-badge">Immortal Relic</span>
+            <h3 class="item-title">Totem of Undying</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Grants fatal damage evasion, Regeneration II, and Fire Resistance.</p>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">44</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
+          </div>
+
+          <div class="product-card texture-obsidian" 
                data-id="armor-helmet"
                data-name="Crown of the Abyss"
                data-base-price="24" 
@@ -1075,11 +1459,14 @@
             <div class="price-tag">
               Price: <span class="cost-badge"><span class="current-price">24</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
           </div>
 
-          <!-- Chestplate -->
-          <div class="product-card" 
+          <div class="product-card texture-obsidian" 
                data-id="armor-chest"
                data-name="Bastion Bulwark"
                data-base-price="40" 
@@ -1097,11 +1484,14 @@
             <div class="price-tag">
               Price: <span class="cost-badge"><span class="current-price">40</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
           </div>
 
-          <!-- Leggings -->
-          <div class="product-card" 
+          <div class="product-card texture-obsidian" 
                data-id="armor-legs"
                data-name="Stride Greaves"
                data-base-price="34" 
@@ -1119,11 +1509,14 @@
             <div class="price-tag">
               Price: <span class="cost-badge"><span class="current-price">34</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
           </div>
 
-          <!-- Boots -->
-          <div class="product-card" 
+          <div class="product-card texture-obsidian" 
                data-id="armor-boots"
                data-name="Cloudwalkers"
                data-base-price="20" 
@@ -1141,18 +1534,117 @@
             <div class="price-tag">
               Price: <span class="cost-badge"><span class="current-price">20</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- TAB 3: ENCHANTED BOOKS -->
+      <!-- TAB 3: REDSTONE ITEMS -->
+      <div class="tab-pane" id="redstone-tab">
+        <div class="product-grid">
+          <div class="product-card texture-redstone" data-id="rs-block" data-name="Redstone Block" data-base-price="18">
+            <img class="product-image" src="images/redstone.png" alt="Redstone Block" />
+            <span class="badge badge-redstone">Pulse Component</span>
+            <h3 class="item-title">Redstone Block</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Permanent signal conductor. Supplies solid power level 15.</p>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">18</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
+          </div>
+
+          <div class="product-card texture-redstone" data-id="rs-torch" data-name="Redstone Torch" data-base-price="8">
+            <img class="product-image" src="images/redstone_torch.png" alt="Redstone Torch" />
+            <span class="badge badge-redstone">Inverter Arcana</span>
+            <h3 class="item-title">Redstone Torch</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Classic logic gate NOT inverter and vertical wire propagator.</p>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">8</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
+          </div>
+
+          <div class="product-card texture-redstone" data-id="rs-quartz" data-name="Nether Quartz" data-base-price="12">
+            <img class="product-image" src="images/quartz.png" alt="Nether Quartz" />
+            <span class="badge badge-redstone">Raw Conductor</span>
+            <h3 class="item-title">Nether Quartz</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">High-resonance mineral needed to assemble comparators and daylight sensors.</p>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">12</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
+          </div>
+
+          <div class="product-card texture-redstone" data-id="rs-comparator" data-name="Redstone Comparator" data-base-price="22">
+            <img class="product-image" src="images/comparator.png" alt="Redstone Comparator" />
+            <span class="badge badge-redstone">Analog Logic</span>
+            <h3 class="item-title">Redstone Comparator</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Analyzes inventory fullness, compares pulse strengths, or subtracts signals.</p>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">22</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
+          </div>
+
+          <div class="product-card texture-redstone" data-id="rs-repeater" data-name="Redstone Repeater" data-base-price="14">
+            <img class="product-image" src="images/repeater.png" alt="Redstone Repeater" />
+            <span class="badge badge-redstone">Clock Regulator</span>
+            <h3 class="item-title">Redstone Repeater</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Amplifies signal reach to 15 blocks and configures 1 to 4 tick delay timing.</p>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">14</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
+          </div>
+
+          <div class="product-card texture-redstone" data-id="rs-crafter" data-name="Crafter Block" data-base-price="36">
+            <img class="product-image" src="images/crafter_north.png" alt="Crafter Block" />
+            <span class="badge badge-redstone">Auto Foundry</span>
+            <h3 class="item-title">Crafter Block</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Revolutionary automated autocrafter block powered by periodic redstone ticks.</p>
+            <div class="price-tag">
+              Price: <span class="cost-badge"><span class="current-price">36</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
+            </div>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: ENCHANTED BOOKS -->
       <div class="tab-pane" id="librarian-tab">
         <div class="sale-banner">
           📜 Books are on sale randomly. So check everyday for the book you want!
         </div>
         <div class="product-grid">
-          <div class="product-card" data-id="book-mending" data-name="Tome of Mending" data-base-price="48">
+          <div class="product-card texture-oak-planks" data-id="book-mending" data-name="Tome of Mending" data-base-price="48">
             <img class="product-image" src="images/enchanted_book.png" alt="Tome of Mending" />
             <span class="badge badge-book">Forbidden Arcana</span>
             <h3 class="item-title">Tome of Mending</h3>
@@ -1160,10 +1652,14 @@
             <div class="price-tag">
               Price: <span class="cost-badge"><span class="current-price">48</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
           </div>
 
-          <div class="product-card" data-id="book-fortune" data-name="Tome of Fortune III" data-base-price="36">
+          <div class="product-card texture-oak-planks" data-id="book-fortune" data-name="Tome of Fortune III" data-base-price="36">
             <img class="product-image" src="images/enchanted_book.png" alt="Tome of Fortune III" />
             <span class="badge badge-book">Resource Arcana</span>
             <h3 class="item-title">Tome of Fortune III</h3>
@@ -1171,10 +1667,14 @@
             <div class="price-tag">
               Price: <span class="cost-badge"><span class="current-price">36</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
           </div>
 
-          <div class="product-card" data-id="book-silktouch" data-name="Tome of Silk Touch" data-base-price="32">
+          <div class="product-card texture-oak-planks" data-id="book-silktouch" data-name="Tome of Silk Touch" data-base-price="32">
             <img class="product-image" src="images/enchanted_book.png" alt="Tome of Silk Touch" />
             <span class="badge badge-book">Excavation Arcana</span>
             <h3 class="item-title">Tome of Silk Touch</h3>
@@ -1182,10 +1682,14 @@
             <div class="price-tag">
               Price: <span class="cost-badge"><span class="current-price">32</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
           </div>
 
-          <div class="product-card" data-id="book-looting" data-name="Tome of Looting III" data-base-price="42">
+          <div class="product-card texture-oak-planks" data-id="book-looting" data-name="Tome of Looting III" data-base-price="42">
             <img class="product-image" src="images/enchanted_book.png" alt="Tome of Looting III" />
             <span class="badge badge-book">Combat Arcana</span>
             <h3 class="item-title">Tome of Looting III</h3>
@@ -1193,10 +1697,14 @@
             <div class="price-tag">
               Price: <span class="cost-badge"><span class="current-price">42</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
           </div>
 
-          <div class="product-card" data-id="book-featherfall" data-name="Tome of Feather Falling IV" data-base-price="28">
+          <div class="product-card texture-oak-planks" data-id="book-featherfall" data-name="Tome of Feather Falling IV" data-base-price="28">
             <img class="product-image" src="images/enchanted_book.png" alt="Tome of Feather Falling IV" />
             <span class="badge badge-book">Survival Arcana</span>
             <h3 class="item-title">Tome of Feather Falling IV</h3>
@@ -1204,10 +1712,14 @@
             <div class="price-tag">
               Price: <span class="cost-badge"><span class="current-price">28</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
           </div>
 
-          <div class="product-card" data-id="book-infinity" data-name="Tome of Infinity" data-base-price="30">
+          <div class="product-card texture-oak-planks" data-id="book-infinity" data-name="Tome of Infinity" data-base-price="30">
             <img class="product-image" src="images/enchanted_book.png" alt="Tome of Infinity" />
             <span class="badge badge-book">Archery Arcana</span>
             <h3 class="item-title">Tome of Infinity</h3>
@@ -1215,10 +1727,14 @@
             <div class="price-tag">
               Price: <span class="cost-badge"><span class="current-price">30</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
           </div>
 
-          <div class="product-card" data-id="book-sharpness" data-name="Tome of Sharpness V" data-base-price="38">
+          <div class="product-card texture-oak-planks" data-id="book-sharpness" data-name="Tome of Sharpness V" data-base-price="38">
             <img class="product-image" src="images/enchanted_book.png" alt="Tome of Sharpness V" />
             <span class="badge badge-book">Combat Arcana</span>
             <h3 class="item-title">Tome of Sharpness V</h3>
@@ -1226,10 +1742,14 @@
             <div class="price-tag">
               Price: <span class="cost-badge"><span class="current-price">38</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
           </div>
 
-          <div class="product-card" data-id="book-swiftsneak" data-name="Tome of Swift Sneak III" data-base-price="45">
+          <div class="product-card texture-oak-planks" data-id="book-swiftsneak" data-name="Tome of Swift Sneak III" data-base-price="45">
             <img class="product-image" src="images/enchanted_book.png" alt="Tome of Swift Sneak III" />
             <span class="badge badge-book">Ancient City Relic</span>
             <h3 class="item-title">Tome of Swift Sneak III</h3>
@@ -1237,10 +1757,14 @@
             <div class="price-tag">
               Price: <span class="cost-badge"><span class="current-price">45</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
           </div>
 
-          <div class="product-card" data-id="book-fireaspect" data-name="Tome of Fire Aspect II" data-base-price="34">
+          <div class="product-card texture-oak-planks" data-id="book-fireaspect" data-name="Tome of Fire Aspect II" data-base-price="34">
             <img class="product-image" src="images/enchanted_book.png" alt="Tome of Fire Aspect II" />
             <span class="badge badge-book">Combat Arcana</span>
             <h3 class="item-title">Tome of Fire Aspect II</h3>
@@ -1248,10 +1772,14 @@
             <div class="price-tag">
               Price: <span class="cost-badge"><span class="current-price">34</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
           </div>
 
-          <div class="product-card" data-id="book-efficiency" data-name="Tome of Efficiency V" data-base-price="40">
+          <div class="product-card texture-oak-planks" data-id="book-efficiency" data-name="Tome of Efficiency V" data-base-price="40">
             <img class="product-image" src="images/enchanted_book.png" alt="Tome of Efficiency V" />
             <span class="badge badge-book">Excavation Arcana</span>
             <h3 class="item-title">Tome of Efficiency V</h3>
@@ -1259,7 +1787,11 @@
             <div class="price-tag">
               Price: <span class="cost-badge"><span class="current-price">40</span><img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <div class="cart-actions-row">
+              <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+              <button class="quick-qty-btn quick-minus-btn" title="Remove 1" onclick="quickRemoveOne(this)">-</button>
+              <button class="quick-qty-btn quick-plus-btn" title="Add 1 More" onclick="quickAddOne(this)">+</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1297,7 +1829,7 @@
         <form id="checkout-form" onsubmit="handleDeliverySubmit(event)">
           <div class="form-group">
             <label for="player-ign">Player Gamertag / IGN *</label>
-            <input type="text" id="player-ign" class="form-control" placeholder="e.g. Steve_Craftsman" required />
+            <input type="text" id="player-ign" class="form-control" value="Steve_Craftsman" required />
           </div>
 
           <div class="form-group">
@@ -1312,15 +1844,15 @@
           <div class="form-group">
             <label>Delivery Coordinates (X, Y, Z) *</label>
             <div class="coord-grid">
-              <input type="number" id="coord-x" class="form-control" placeholder="X: 1240" required />
-              <input type="number" id="coord-y" class="form-control" placeholder="Y: 64" required />
-              <input type="number" id="coord-z" class="form-control" placeholder="Z: -890" required />
+              <input type="number" id="coord-x" class="form-control" value="1240" required />
+              <input type="number" id="coord-y" class="form-control" value="64" required />
+              <input type="number" id="coord-z" class="form-control" value="-890" required />
             </div>
           </div>
 
           <div class="form-group">
             <label for="player-notes">Special Instructions for Wandering Traders</label>
-            <input type="text" id="player-notes" class="form-control" placeholder="e.g. Leave in bedrock lockbox outside portal" />
+            <input type="text" id="player-notes" class="form-control" value="Leave in lockbox by obsidian portal" />
           </div>
 
           <button type="submit" class="checkout-btn" style="padding: 1rem; font-size: 1.1rem;">
@@ -1337,9 +1869,14 @@
       <div class="success-card">
         <canvas id="particle-canvas"></canvas>
 
-        <img class="ender-chest-graphic" src="images/ender_chest.webp" alt="Ender Chest Sync" onerror="this.style.display='none'" />
+        <div class="ender-chest-wrapper">
+          <img class="ender-chest-graphic" 
+               src="images/ender_chest.webp" 
+               alt="Ender Chest Sync"
+               onerror="this.onerror=null; this.src='images/ender_chest.png';" />
+        </div>
 
-        <h2 style="color: var(--accent-emerald); font-size: 2.2rem; margin-bottom: 0.5rem;">Sync Protocol Complete!</h2>
+        <h2 style="color: var(--accent-emerald); font-size: 2.4rem; margin-bottom: 0.5rem; text-shadow: 2px 2px 0px #000;">Sync Protocol Complete!</h2>
         <p style="color: var(--text-muted); font-size: 1.05rem;">Your transaction has been approved by the Village Cleric Guild. Your Ender Chest has synced across dimensions.</p>
 
         <div class="receipt-box" id="success-receipt-content">
@@ -1386,6 +1923,151 @@
   <script>
     let cart = [];
 
+    // --- Dynamic Diamond Pickaxe Cursor Tracking ---
+    const cursor = document.getElementById('minecraft-cursor');
+    let currentSide = 'right';
+
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+
+      currentSide = e.clientX < window.innerWidth / 2 ? 'left' : 'right';
+
+      if (miningActive) {
+        applyMiningAnimation();
+      }
+    });
+
+    // Touch support on mobile devices
+    document.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) {
+        cursor.style.left = e.touches[0].clientX + 'px';
+        cursor.style.top = e.touches[0].clientY + 'px';
+        currentSide = e.touches[0].clientX < window.innerWidth / 2 ? 'left' : 'right';
+      }
+    }, { passive: true });
+
+    function applyMiningAnimation() {
+      cursor.classList.remove('mining-left', 'mining-right');
+      cursor.classList.add('touch-active'); // Temporarily visible during mobile touch mining
+      if (currentSide === 'left') {
+        cursor.classList.add('mining-left');
+      } else {
+        cursor.classList.add('mining-right');
+      }
+    }
+
+    function stopMiningAnimation() {
+      cursor.classList.remove('mining-left', 'mining-right', 'touch-active');
+    }
+
+    // --- Lucky Block Context Deals & Spawning Engine ---
+    let activeLuckyBlocks = [];
+    let currentActiveTab = 'tools-tab';
+    let currentLuckyDeal = null;
+
+    const luckyImg = new Image();
+    luckyImg.src = 'images/lucky_blocks.png';
+
+    function spawnLuckyBlocksForTab(tabId) {
+      activeLuckyBlocks = activeLuckyBlocks.filter(b => b.tabId !== tabId);
+
+      let count = 0;
+      if (tabId === 'tools-tab' || tabId === 'redstone-tab') {
+        count = 1;
+      } else {
+        const roll = Math.random();
+        if (roll < 0.001) {
+          count = Math.floor(Math.random() * 2) + 2;
+        } else if (roll < 0.10) {
+          count = 1;
+        }
+      }
+
+      for (let i = 0; i < count; i++) {
+        const padding = 100;
+        const randomX = Math.floor(Math.random() * (window.innerWidth - padding * 2)) + padding;
+        const randomY = Math.floor(Math.random() * (window.innerHeight - padding * 2)) + padding;
+        
+        const snapX = Math.floor(randomX / MINE_SIZE) * MINE_SIZE;
+        const snapY = Math.floor(randomY / MINE_SIZE) * MINE_SIZE;
+
+        activeLuckyBlocks.push({
+          id: `lucky-${tabId}-${i}`,
+          tabId: tabId,
+          x: snapX,
+          y: snapY,
+          size: MINE_SIZE,
+          mined: false
+        });
+      }
+      drawFullBackground();
+    }
+
+    // Slashes 40-60% off an existing product from the active tab
+    function triggerLuckyReward(tabId) {
+      const activePane = document.getElementById(tabId);
+      const cards = Array.from(activePane.querySelectorAll('.product-card'));
+      
+      if (cards.length === 0) return;
+      const randomCard = cards[Math.floor(Math.random() * cards.length)];
+
+      const baseName = randomCard.getAttribute('data-name') || randomCard.querySelector('.item-title').textContent;
+      const basePrice = parseInt(randomCard.getAttribute('data-base-price'));
+      const imgSrc = randomCard.querySelector('.product-image').src;
+      const badgeText = randomCard.querySelector('.badge').textContent;
+
+      const discountPercent = Math.floor(Math.random() * 21) + 40; // 40% - 60%
+      const discountedPrice = Math.max(1, Math.round(basePrice * (1 - discountPercent / 100)));
+
+      currentLuckyDeal = {
+        name: baseName,
+        basePrice: basePrice,
+        price: discountedPrice,
+        discountPercent: discountPercent,
+        tier: `${badgeText} (${discountPercent}% OFF)`,
+        imgSrc: imgSrc
+      };
+
+      document.getElementById('lucky-offer-title').textContent = "Lucky Price Slash!";
+      document.getElementById('lucky-offer-desc').textContent = `Lucky Block cracked open! Grab ${baseName} for ${discountPercent}% off!`;
+      document.getElementById('lucky-item-name').textContent = currentLuckyDeal.name;
+      document.getElementById('lucky-item-tier').textContent = currentLuckyDeal.tier;
+      document.getElementById('lucky-item-orig').textContent = `${basePrice} EME`;
+      document.getElementById('lucky-item-price').textContent = discountedPrice;
+      document.getElementById('lucky-item-img').src = imgSrc;
+
+      document.getElementById('lucky-modal-overlay').classList.add('open');
+      playSuccessFanfare();
+    }
+
+    function closeLuckyModal() {
+      document.getElementById('lucky-modal-overlay').classList.remove('open');
+    }
+
+    function claimLuckyDeal() {
+      if (!currentLuckyDeal) return;
+      
+      const itemKey = `lucky-deal-${currentLuckyDeal.name}`;
+      const existing = cart.find(i => i.cartKey === itemKey);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({
+          cartKey: itemKey,
+          name: `${currentLuckyDeal.name} [Lucky Deal]`,
+          tier: 'Lucky Deal',
+          price: currentLuckyDeal.price,
+          imgSrc: currentLuckyDeal.imgSrc,
+          qty: 1
+        });
+      }
+
+      renderCart();
+      closeLuckyModal();
+      toggleCartDrawer(true);
+    }
+
     function toggleCartDrawer(open) {
       const drawer = document.getElementById('cart-drawer');
       const overlay = document.getElementById('cart-drawer-overlay');
@@ -1398,13 +2080,13 @@
       }
     }
 
-    function addToCart(button) {
+    function quickAddOne(button) {
       const card = button.closest('.product-card');
       const baseId = card.getAttribute('data-id');
       const name = card.getAttribute('data-name') || card.querySelector('.item-title').textContent;
       const price = parseInt(card.querySelector('.current-price').textContent);
       const isNetherite = card.querySelector('.upgrade-toggle input')?.checked || false;
-      const tier = isNetherite ? 'Netherite' : (card.getAttribute('data-diamond-img') ? 'Diamond' : 'Arcana');
+      const tier = isNetherite ? 'Netherite' : (card.getAttribute('data-diamond-img') ? 'Diamond' : (baseId.startsWith('rs-') ? 'Redstone' : (baseId === 'pvp-totem' ? 'Relic' : 'Arcana')));
       const imgSrc = card.querySelector('.product-image').src;
 
       const itemKey = `${baseId}-${tier}`;
@@ -1425,6 +2107,38 @@
 
       renderCart();
 
+      button.style.transform = "scale(1.25)";
+      button.style.backgroundColor = "var(--accent-emerald)";
+      button.style.color = "#05140b";
+      setTimeout(() => {
+        button.style.transform = "";
+        button.style.backgroundColor = "";
+        button.style.color = "";
+      }, 160);
+    }
+
+    function quickRemoveOne(button) {
+      const card = button.closest('.product-card');
+      const baseId = card.getAttribute('data-id');
+      const isNetherite = card.querySelector('.upgrade-toggle input')?.checked || false;
+      const tier = isNetherite ? 'Netherite' : (card.getAttribute('data-diamond-img') ? 'Diamond' : (baseId.startsWith('rs-') ? 'Redstone' : (baseId === 'pvp-totem' ? 'Relic' : 'Arcana')));
+      const itemKey = `${baseId}-${tier}`;
+
+      updateItemQty(itemKey, -1);
+
+      button.style.transform = "scale(1.25)";
+      button.style.backgroundColor = "#ff5252";
+      button.style.color = "#05140b";
+      setTimeout(() => {
+        button.style.transform = "";
+        button.style.backgroundColor = "";
+        button.style.color = "";
+      }, 160);
+    }
+
+    function addToCart(button) {
+      quickAddOne(button);
+
       const originalText = button.textContent;
       button.textContent = "Synced to Ender Chest!";
       button.style.backgroundColor = "var(--accent-emerald)";
@@ -1432,8 +2146,8 @@
       
       setTimeout(() => {
         button.textContent = originalText;
-        button.style.backgroundColor = "var(--card-bg)";
-        button.style.color = "var(--accent-emerald)";
+        button.style.backgroundColor = "";
+        button.style.color = "";
       }, 900);
     }
 
@@ -1538,7 +2252,6 @@
       } catch (err) {}
     }
 
-    // 5+ Second XP & Portal Particle Burst
     function launchSuccessParticles() {
       const pCanvas = document.getElementById('particle-canvas');
       const pCtx = pCanvas.getContext('2d');
@@ -1547,10 +2260,10 @@
       pCanvas.width = parent.offsetWidth;
       pCanvas.height = parent.offsetHeight;
 
-      const particles = Array.from({ length: 80 }, () => ({
-        x: pCanvas.width / 2 + (Math.random() - 0.5) * 120,
-        y: 110 + (Math.random() - 0.5) * 60,
-        vx: (Math.random() - 0.5) * 2.2,
+      const particles = Array.from({ length: 85 }, () => ({
+        x: pCanvas.width / 2 + (Math.random() - 0.5) * 140,
+        y: 80 + (Math.random() - 0.5) * 50,
+        vx: (Math.random() - 0.5) * 2.5,
         vy: -(Math.random() * 1.5 + 0.6),
         size: Math.random() * 4 + 2,
         color: Math.random() > 0.45 ? '#55ff55' : '#a855f7',
@@ -1601,7 +2314,7 @@
         <div class="receipt-row"><span>DIMENSION:</span> <span>${dimension}</span></div>
         <div class="receipt-row"><span>COORDINATES:</span> <span>X: ${x}, Y: ${y}, Z: ${z}</span></div>
         <div class="receipt-row"><span>STATUS:</span> <span style="color: var(--accent-emerald); font-weight: bold;">Synced to Ender Chest</span></div>
-        <hr style="border-color: var(--border-color); margin: 0.8rem 0;">
+        <hr style="border-color: #5a3c29; margin: 0.8rem 0;">
         <div class="receipt-row" style="font-weight: bold;">
           <span>EMERALDS DEDUCTED:</span> 
           <span class="cost-badge">${grandTotal}<img class="emerald-icon" src="images/emerald.png" alt="EME"></span>
@@ -1619,16 +2332,20 @@
       switchPage('armory');
     }
 
-    // --- Scaled Cobblestone & Hold-to-Mine Engine ---
+    // --- Scaled Stone Background & 10 Separate Images Breaking Animation ---
     const canvas = document.getElementById('cobble-canvas');
     const ctx = canvas.getContext('2d');
     const MINE_SIZE = 48;
 
-    const cobbleImg = new Image();
-    cobbleImg.src = 'images/cobblestone.png';
+    const stoneImg = new Image();
+    stoneImg.src = 'images/stone.png';
 
-    const destroyImg = new Image();
-    destroyImg.src = 'images/destroy_stages.png';
+    const destroyImages = [];
+    for (let i = 0; i <= 9; i++) {
+      const img = new Image();
+      img.src = `images/destroy_stages_${i}.png`;
+      destroyImages.push(img);
+    }
 
     let scaledPattern = null;
 
@@ -1649,17 +2366,36 @@
     }
 
     function drawFullBackground() {
-      if (!scaledPattern && cobbleImg.complete && cobbleImg.naturalWidth > 0) {
-        scaledPattern = createScaledPattern(cobbleImg, 3);
+      if (!scaledPattern && stoneImg.complete && stoneImg.naturalWidth > 0) {
+        scaledPattern = createScaledPattern(stoneImg, 3);
       }
       if (scaledPattern) {
         ctx.fillStyle = scaledPattern;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
+
+      // Render Lucky Blocks for active view
+      activeLuckyBlocks.forEach(lb => {
+        if (!lb.mined && lb.tabId === currentActiveTab) {
+          ctx.save();
+          ctx.imageSmoothingEnabled = false;
+          if (luckyImg.complete && luckyImg.naturalWidth > 0) {
+            ctx.drawImage(luckyImg, lb.x, lb.y, lb.size, lb.size);
+          } else {
+            ctx.fillStyle = '#ffcc00';
+            ctx.fillRect(lb.x, lb.y, lb.size, lb.size);
+          }
+          ctx.restore();
+        }
+      });
     }
 
-    cobbleImg.onload = () => {
-      scaledPattern = createScaledPattern(cobbleImg, 3);
+    stoneImg.onload = () => {
+      scaledPattern = createScaledPattern(stoneImg, 3);
+      drawFullBackground();
+    };
+
+    luckyImg.onload = () => {
       drawFullBackground();
     };
 
@@ -1670,8 +2406,9 @@
     let miningTimer = null;
     let currentMineX = 0;
     let currentMineY = 0;
+    let targetLuckyBlock = null;
     const totalStages = 10;
-    const stageDuration = 150; // 10 * 150ms = 1500ms (1.5 seconds)
+    const stageDuration = 150;
 
     function drawProceduralCrack(x, y, size, stage, totalStages) {
       ctx.save();
@@ -1690,7 +2427,7 @@
       ctx.moveTo(x + mid, y + mid);
       ctx.lineTo(x + mid - reach * 0.7, y + mid + reach);
       ctx.moveTo(x + mid, y + mid);
-      ctx.lineTo(x + mid + reach * 0.9, y + mid + reach * 0.9);
+      ctx.lineTo(x + mid + reach, y + mid - reach * 0.9);
       
       if (stage >= 3) {
         ctx.moveTo(x + mid - reach * 0.5, y + mid);
@@ -1705,17 +2442,24 @@
       ctx.restore();
     }
 
-    window.addEventListener('mousedown', (e) => {
-      if (e.button !== 0) return;
-      const interactiveTarget = e.target.closest('button, a, input, select, label, #cart-drawer, .product-card, .category-card, .story-content, .form-card, .success-card');
-      if (interactiveTarget) return;
+    function startMining(clientX, clientY) {
+      targetLuckyBlock = activeLuckyBlocks.find(lb => 
+        !lb.mined && 
+        lb.tabId === currentActiveTab &&
+        clientX >= lb.x && clientX <= lb.x + lb.size &&
+        clientY >= lb.y && clientY <= lb.y + lb.size
+      );
 
-      const clickX = e.clientX;
-      const clickY = e.clientY;
-      currentMineX = Math.floor(clickX - MINE_SIZE / 2);
-      currentMineY = Math.floor(clickY - MINE_SIZE / 2);
+      if (targetLuckyBlock) {
+        currentMineX = targetLuckyBlock.x;
+        currentMineY = targetLuckyBlock.y;
+      } else {
+        currentMineX = Math.floor(clientX - MINE_SIZE / 2);
+        currentMineY = Math.floor(clientY - MINE_SIZE / 2);
+      }
 
       miningActive = true;
+      applyMiningAnimation();
       let currentStage = 0;
 
       miningTimer = setInterval(() => {
@@ -1724,36 +2468,26 @@
           return;
         }
 
-        if (scaledPattern) {
+        if (targetLuckyBlock) {
+          ctx.save();
+          ctx.imageSmoothingEnabled = false;
+          if (luckyImg.complete && luckyImg.naturalWidth > 0) {
+            ctx.drawImage(luckyImg, currentMineX, currentMineY, MINE_SIZE, MINE_SIZE);
+          } else {
+            ctx.fillStyle = '#ffcc00';
+            ctx.fillRect(currentMineX, currentMineY, MINE_SIZE, MINE_SIZE);
+          }
+          ctx.restore();
+        } else if (scaledPattern) {
           ctx.fillStyle = scaledPattern;
           ctx.fillRect(currentMineX, currentMineY, MINE_SIZE, MINE_SIZE);
         }
 
-        let renderedSprite = false;
-        if (destroyImg.complete && destroyImg.naturalWidth > 0) {
+        const currentDestroyImg = destroyImages[currentStage];
+        if (currentDestroyImg && currentDestroyImg.complete && currentDestroyImg.naturalWidth > 0) {
           ctx.imageSmoothingEnabled = false;
-          if (destroyImg.naturalWidth > destroyImg.naturalHeight) {
-            const spriteW = destroyImg.naturalWidth / totalStages;
-            const spriteH = destroyImg.naturalHeight;
-            ctx.drawImage(
-              destroyImg,
-              currentStage * spriteW, 0, spriteW, spriteH,
-              currentMineX, currentMineY, MINE_SIZE, MINE_SIZE
-            );
-            renderedSprite = true;
-          } else {
-            const spriteW = destroyImg.naturalWidth;
-            const spriteH = destroyImg.naturalHeight / totalStages;
-            ctx.drawImage(
-              destroyImg,
-              0, currentStage * spriteH, spriteW, spriteH,
-              currentMineX, currentMineY, MINE_SIZE, MINE_SIZE
-            );
-            renderedSprite = true;
-          }
-        }
-
-        if (!renderedSprite) {
+          ctx.drawImage(currentDestroyImg, currentMineX, currentMineY, MINE_SIZE, MINE_SIZE);
+        } else {
           drawProceduralCrack(currentMineX, currentMineY, MINE_SIZE, currentStage, totalStages);
         }
 
@@ -1762,6 +2496,7 @@
         if (currentStage >= totalStages) {
           clearInterval(miningTimer);
           miningActive = false;
+          stopMiningAnimation();
 
           ctx.clearRect(currentMineX, currentMineY, MINE_SIZE, MINE_SIZE);
           ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
@@ -1769,36 +2504,59 @@
 
           const restoreX = currentMineX;
           const restoreY = currentMineY;
+          const minedBlockRef = targetLuckyBlock;
+
+          if (minedBlockRef) {
+            minedBlockRef.mined = true;
+            triggerLuckyReward(currentActiveTab);
+          }
 
           setTimeout(() => {
             if (scaledPattern) {
               ctx.fillStyle = scaledPattern;
               ctx.fillRect(restoreX, restoreY, MINE_SIZE, MINE_SIZE);
             }
+            drawFullBackground();
           }, 1000);
         }
       }, stageDuration);
+    }
+
+    window.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      const interactiveTarget = e.target.closest('button, a, input, select, label, #cart-drawer, .product-card, .category-card, .story-content, .form-card, .success-card, .modal-box');
+      if (interactiveTarget) return;
+
+      startMining(e.clientX, e.clientY);
     });
+
+    // Touch mining support on mobile
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 0) {
+        const t = e.touches[0];
+        const interactiveTarget = e.target.closest('button, a, input, select, label, #cart-drawer, .product-card, .category-card, .story-content, .form-card, .success-card, .modal-box');
+        if (interactiveTarget) return;
+        
+        cursor.style.left = t.clientX + 'px';
+        cursor.style.top = t.clientY + 'px';
+        currentSide = t.clientX < window.innerWidth / 2 ? 'left' : 'right';
+        startMining(t.clientX, t.clientY);
+      }
+    }, { passive: true });
 
     function cancelMining() {
       if (miningActive) {
         miningActive = false;
+        stopMiningAnimation();
         clearInterval(miningTimer);
-        if (scaledPattern) {
-          ctx.fillStyle = scaledPattern;
-          ctx.fillRect(currentMineX, currentMineY, MINE_SIZE, MINE_SIZE);
-        }
+        drawFullBackground();
       }
     }
 
     window.addEventListener('mouseup', cancelMining);
     window.addEventListener('mouseleave', cancelMining);
-
-    const cursor = document.getElementById('minecraft-cursor');
-    document.addEventListener('mousemove', (e) => {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top = e.clientY + 'px';
-    });
+    window.addEventListener('touchend', cancelMining);
+    window.addEventListener('touchcancel', cancelMining);
 
     function switchPage(pageId) {
       document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
@@ -1810,6 +2568,10 @@
       if (target) target.classList.add('active');
       if (navLink) navLink.classList.add('active');
       window.scrollTo(0, 0);
+
+      if (pageId === 'armory') {
+        spawnLuckyBlocksForTab(currentActiveTab);
+      }
     }
 
     function switchTab(tabId) {
@@ -1821,6 +2583,9 @@
 
       if (targetPane) targetPane.classList.add('active');
       if (targetBtn) targetBtn.classList.add('active');
+
+      currentActiveTab = tabId;
+      spawnLuckyBlocksForTab(tabId);
     }
 
     function toggleNetherite(checkbox) {
@@ -1852,6 +2617,8 @@
         }
       }
     }
+
+    spawnLuckyBlocksForTab('tools-tab');
   </script>
 </body>
 </html>
